@@ -14,6 +14,10 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#e8e4d8;color:var(--ink);font-family:'Kalam',cursive;height:100%;}
 body{display:flex;flex-direction:column;min-height:100vh;}
+body.immersive .dev{display:none;}
+#exit-immersive{display:none;position:fixed;top:10px;right:10px;z-index:1000;width:28px;height:28px;border-radius:50%;border:1.2px solid var(--ink);background:#fff;box-shadow:2px 2px 0 var(--ink);cursor:pointer;font-size:13px;line-height:26px;text-align:center;font-family:'IBM Plex Mono',monospace;opacity:.6;}
+#exit-immersive:hover{opacity:1;}
+body.immersive #exit-immersive{display:block;}
 
 /* dev toggle strip */
 .dev{display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--ink);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;}
@@ -28,33 +32,63 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* frame (the "browser window" holding the app) */
-.frame{flex:1;background:var(--paper);border-top:none;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.frame{flex:1;background:var(--paper);border-top:none;display:flex;flex-direction:column;min-height:0;overflow:hidden;position:relative;}
 
 /* top chrome (app-level) */
-.top{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1.2px solid var(--ink);background:#fff;font-size:12px;}
-.home{font-family:'Caveat',cursive;font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;}
-.home .ic{width:18px;height:18px;border:1.5px solid var(--ink);border-radius:4px;background:var(--warm);display:grid;place-items:center;font-size:10px;}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:7px 14px;border-bottom:1.2px solid var(--ink);background:#fff;font-size:12px;position:relative;}
+.top-left{display:flex;align-items:center;gap:8px;}
+.top-center{display:flex;align-items:center;justify-content:center;font-family:'Kalam',cursive;font-size:13px;color:#333;}
+.top-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;}
+.home{display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 4px;}
+.home .ic{width:20px;height:20px;border:1.5px solid var(--ink);border-radius:4px;background:var(--warm);display:grid;place-items:center;font-size:11px;}
 .home:hover .ic{background:var(--acc4);}
-.top .crumb{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;}
-.top .sp{flex:1;}
-.top .newbtn{font-family:'Kalam',cursive;font-size:12px;padding:2px 8px;border:1.2px solid var(--ink);background:#fff;cursor:pointer;box-shadow:1.5px 1.5px 0 var(--ink);}
-.top .newbtn:hover{background:var(--warm);}
+.wordmark{font-family:'Caveat',cursive;font-size:18px;font-weight:700;letter-spacing:-.01em;}
+.newbtn{font-family:'Kalam',cursive;font-size:12px;padding:2px 8px;border:1.2px solid var(--ink);background:#fff;cursor:pointer;box-shadow:1.5px 1.5px 0 var(--ink);}
+.newbtn:hover{background:var(--warm);}
 .pill{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 7px;border:1px solid var(--ink);background:var(--warm);letter-spacing:.06em;}
+.profile-btn{display:flex;align-items:center;gap:6px;border:1.2px solid var(--ink);background:#fff;padding:3px 8px 3px 6px;font-family:'Kalam',cursive;font-size:12px;cursor:pointer;box-shadow:1.5px 1.5px 0 var(--ink);}
+.profile-btn:hover{background:var(--warm);}
+.profile-btn .av{width:16px;height:16px;border:1.2px solid var(--ink);border-radius:50%;background:var(--acc4);display:grid;place-items:center;font-size:8px;font-family:'IBM Plex Mono',monospace;font-weight:700;}
+.profile-btn .cred{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;letter-spacing:.03em;}
+.profile-btn .cred .sp{color:var(--acc);margin-right:2px;}
+.top-float{position:absolute;top:10px;right:14px;z-index:20;}
+.profile-menu{position:absolute;top:100%;right:0;margin-top:4px;width:260px;background:#fff;border:1.2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);z-index:10;font-family:'Kalam',cursive;font-size:13px;}
+.profile-menu .hdr{padding:12px 14px 10px;border-bottom:1px solid var(--faint);}
+.profile-menu .nm{font-weight:700;color:var(--ink);line-height:1.1;}
+.profile-menu .em{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#666;margin-top:2px;letter-spacing:.02em;}
+.profile-menu .plan{padding:10px 14px;border-bottom:1px solid var(--faint);background:var(--warm);}
+.profile-menu .plan-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.profile-menu .plan-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#555;letter-spacing:.06em;text-transform:uppercase;}
+.profile-menu .plan-bdg{font-family:'Caveat',cursive;font-size:17px;font-weight:700;line-height:1;}
+.profile-menu .upgrade{display:inline-block;background:var(--ink);color:#fff;padding:3px 9px;font-family:'Caveat',cursive;font-size:14px;font-weight:700;cursor:pointer;border:1.2px solid var(--ink);box-shadow:1.5px 1.5px 0 var(--acc);}
+.profile-menu .upgrade:hover{background:var(--acc);box-shadow:1.5px 1.5px 0 var(--ink);}
+.profile-menu .cred-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#333;}
+.profile-menu .cred-row .sp{color:var(--acc);margin-right:3px;}
+.profile-menu .mi{padding:7px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.profile-menu .mi:hover{background:var(--warm);}
+.profile-menu .mi.destroy{color:#b33;}
+.profile-menu .mi.destroy:hover{background:#fdecec;}
+.profile-menu hr{margin:0;border:none;border-top:1px solid var(--faint);}
+.profile-menu .sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#888;}
 
-/* body layouts */
-.h-body{flex:1;display:grid;grid-template-columns:400px 1fr;min-height:0;overflow:hidden;}
-.h-body.welcome{grid-template-columns:1fr;display:flex;align-items:safe center;justify-content:center;overflow-y:auto;padding:24px;}
-.crt.centered{border-right:none;max-width:520px;width:100%;padding:0;background:transparent;overflow:visible;}
-.crt.centered .qprompt{text-align:center;font-size:26px;margin:8px 0 6px;}
-.crt.centered .skip{margin-top:8px;}
-.p-body{flex:1;display:grid;grid-template-columns:340px 1fr;min-height:0;overflow:hidden;}
+/* body layouts — one thing: a left-sidebar container + optional right gallery.
+   First-time users have no gallery, so the left sidebar expands to full width. */
+.h-body{flex:1;display:grid;grid-template-columns:400px 1fr;grid-template-rows:1fr;min-height:0;overflow:hidden;position:relative;}
+.h-body.solo{grid-template-columns:1fr;}
+.h-body.solo .crt,
+.h-body.solo .chat{border-right:none;}
+.h-body.solo .crt{justify-self:center;max-width:680px;width:100%;}
+.h-body.solo .chat{justify-self:center;max-width:680px;width:100%;}
+.p-body{flex:1;display:grid;grid-template-columns:340px 1fr;min-height:0;overflow:hidden;position:relative;}
+.p-body.solo{grid-template-columns:1fr;}
+.p-body.solo .chat{border-right:none;justify-self:center;max-width:680px;width:100%;}
 
 /* creator panel */
-.crt{border-right:1.5px solid var(--ink);padding:14px 16px;background:var(--paper);display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.crt{border-right:1.5px solid var(--ink);padding:14px 16px;background:var(--paper);display:flex;flex-direction:column;gap:10px;overflow-y:auto;justify-content:safe center;}
 .crt h1{font-family:'Caveat',cursive;font-size:26px;font-weight:700;line-height:1;margin:0 2px;}
 .crt h1 small{font-family:'Kalam',cursive;font-size:14px;color:#555;font-weight:400;display:block;margin-top:2px;}
 
-.qprompt{font-family:'Caveat',cursive;font-size:20px;font-weight:700;margin:2px 2px -2px;}
+.qprompt{font-family:'Caveat',cursive;font-size:20px;font-weight:700;margin:2px 2px 14px;text-align:center;}
 
 .intents{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .intent{border:1.5px solid var(--ink);background:#fff;padding:16px 18px;display:flex;flex-direction:column;gap:3px;cursor:pointer;position:relative;box-shadow:3px 3px 0 var(--ink);transition:transform .08s;min-height:90px;}
@@ -83,7 +117,7 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .drop .drop-main{font-family:'Caveat',cursive;font-size:19px;font-weight:700;color:var(--ink);line-height:1.1;}
 .drop .drop-sub{font-size:11px;color:#777;margin-top:4px;}
 
-.back-top{font-family:'Kalam',cursive;font-size:13px;color:#555;cursor:pointer;width:fit-content;padding:2px 6px 2px 0;margin-bottom:6px;}
+.back-top{position:absolute;top:12px;left:16px;z-index:2;font-family:'Kalam',cursive;font-size:13px;color:#555;cursor:pointer;width:fit-content;padding:2px 6px;}
 .back-top:hover{color:var(--ink);}
 
 .fineprint{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#999;text-align:center;margin-top:-4px;letter-spacing:.03em;}
@@ -111,11 +145,32 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .go:hover{background:var(--acc);box-shadow:2px 2px 0 var(--ink);}
 .go.dim{background:#888;cursor:not-allowed;box-shadow:2px 2px 0 #666;}
 
+/* UGC layout: URL and drop zone side-by-side with "or" divider */
+.ugc-grid{display:grid;grid-template-columns:1fr 32px 1fr;gap:10px;align-items:stretch;}
+.ugc-grid .fld{align-self:center;margin:0;}
+.ugc-grid .drop{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ugc-or{display:flex;flex-direction:column;align-items:center;font-family:'Kalam',cursive;font-size:13px;color:#888;}
+.ugc-or::before,.ugc-or::after{content:'';flex:1;border-left:1.2px dashed #bbb;width:0;min-height:12px;}
+.ugc-or span{padding:6px 0;}
+.ugc-note-btn{text-align:center;font-family:'Kalam',cursive;font-size:13px;color:#666;cursor:pointer;padding:4px;}
+.ugc-note-btn:hover{color:var(--ink);}
+.ugc-note-btn u{text-decoration:underline;}
+
+/* split layout: prompt centered in top half / templates scroll in bottom half */
+.crt.split{justify-content:stretch;padding:0;overflow:hidden;gap:0;}
+.split-top{flex:0 0 calc(50% + 80px);min-height:0;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;}
+.split-bot{flex:1 1 50%;min-height:0;overflow-y:auto;padding:14px 16px;border-top:1.2px solid var(--ink);display:flex;flex-direction:column;gap:6px;}
+.split-ref{display:flex;align-items:center;gap:8px;border:1.2px solid var(--ink);background:#fff;padding:4px 6px 4px 4px;width:fit-content;max-width:100%;}
+.split-ref .thumb{width:38px;height:28px;background-size:cover;background-position:center;border:1px solid var(--ink);flex:0 0 auto;}
+.split-ref .nm{font-family:'Kalam',cursive;font-size:12px;color:var(--ink);line-height:1.1;}
+.split-ref .rm{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#888;cursor:pointer;padding:0 4px;margin-left:2px;}
+.split-ref .rm:hover{color:var(--ink);}
+
 /* gallery */
 .gal{padding:14px 18px;background:var(--warm);overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
 .gtop{display:flex;justify-content:space-between;align-items:center;gap:10px;}
 .gtabs{display:flex;border-bottom:1.2px solid var(--ink);flex:1;}
-.gtabs div{font-size:13px;padding:5px 12px;border:1.2px solid transparent;border-bottom:1.5px solid var(--faint);color:#555;cursor:pointer;font-family:'Kalam',cursive;}
+.gtabs div{font-size:13px;padding:5px 12px;border:1.2px solid transparent;border-bottom:1.5px solid transparent;color:#555;cursor:pointer;font-family:'Kalam',cursive;}
 .gtabs div.on{border:1.5px solid var(--ink);border-bottom:2px solid var(--warm);color:var(--ink);background:var(--warm);position:relative;bottom:-1.5px;font-weight:700;}
 .search{border:1.2px solid var(--faint);padding:4px 9px;font-size:11px;color:#555;background:#fff;width:160px;font-family:'Kalam',cursive;}
 .gsec{font-family:'Caveat',cursive;font-size:17px;color:#444;margin-bottom:-4px;}
@@ -175,28 +230,75 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .composer-send:hover{background:var(--acc);}
 .composer.large .composer-input{min-height:88px;font-size:14px;padding:12px 14px;}
 
-/* Centered intro column */
-.intro-col{max-width:680px;width:100%;display:flex;flex-direction:column;gap:10px;}
-.intro-col .qprompt{text-align:center;font-size:26px;margin:8px 0 6px;}
 
 .art{padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--warm);overflow-y:auto;}
+
+/* In-panel tab bars (post phase). Exact same mechanic as .gtabs on the home page:
+   the tab-bar container owns the dividing line (border-bottom), and the active tab covers
+   a strip of it with its paper-colored bottom border + position:relative; bottom:-1.5px. */
+.art.with-tabs{padding:0;gap:0;background:var(--paper);overflow:hidden;}
+.panel-tab-bar{display:flex;align-items:flex-end;gap:10px;padding:0 14px;background:var(--paper);min-height:40px;flex-shrink:0;}
+.panel-tab-bar .home,.panel-tabs .home{align-self:center;}
+.panel-tabs{display:flex;align-items:flex-end;gap:0;min-width:0;flex:1;border-bottom:1.2px solid var(--ink);}
+.panel-tabs .tab{font-size:13px;padding:5px 12px;border:1.2px solid transparent;border-bottom:1.5px solid transparent;color:#555;cursor:pointer;font-family:'Kalam',cursive;display:flex;align-items:center;gap:6px;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;user-select:none;}
+.panel-tabs .tab:hover{color:var(--ink);}
+.panel-tabs .tab.on{border:1.5px solid var(--ink);border-bottom:2px solid var(--paper);color:var(--ink);background:var(--paper);position:relative;bottom:-1.5px;font-weight:700;}
+.panel-tab-right{margin-left:auto;display:flex;align-items:center;gap:8px;align-self:center;position:relative;}
+.tab-body{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper);}
+.tab-body.media{padding:12px 14px;gap:8px;overflow-y:auto;}
+.media-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.2px solid var(--ink);background:#fff;}
+.media-item .media-ic{font-size:16px;}
+.media-item b{font-family:'Kalam',cursive;font-size:13px;display:block;}
+.media-item .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#777;display:block;margin-top:1px;letter-spacing:.02em;}
+.drop-hint{border:1.5px dashed var(--faint);padding:16px;text-align:center;font-family:'Kalam',cursive;font-size:12px;color:#888;margin-top:4px;}
 .ac{border:1.2px solid var(--ink);background:#fff;padding:10px;box-shadow:3px 3px 0 var(--ink);}
 .ac.blue{border-color:var(--acc2);box-shadow:3px 3px 0 var(--acc2);}
 .ac.acc{border-color:var(--acc);box-shadow:3px 3px 0 var(--acc);}
 .ac .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .ac .h .t{font-family:'Caveat',cursive;font-size:16px;font-weight:700;}
 .ac .h .m{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;}
-.ac .promptbox{background:var(--warm);border:1.2px solid var(--ink);padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;}
-.ac .promptbox .k{color:#888;}
-.ac .row{display:flex;gap:5px;margin-top:6px;}
-.ac .btn{border:1.2px solid var(--ink);padding:3px 9px;font-size:11px;background:#fff;cursor:pointer;font-family:'Kalam',cursive;box-shadow:1.5px 1.5px 0 var(--ink);}
-.ac .btn:hover{background:var(--warm);}
-.ac .btn.p{background:var(--ink);color:#fff;box-shadow:1.5px 1.5px 0 var(--acc);}
-.ac .btn.p:hover{background:var(--acc);}
-.ac .btn.ml{margin-left:auto;}
+.promptbox{background:var(--warm);border:1.2px solid var(--ink);padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;}
+.promptbox .k{color:#888;}
+.row{display:flex;gap:5px;margin-top:6px;}
+.btn{border:1.2px solid var(--ink);padding:3px 9px;font-size:11px;background:#fff;cursor:pointer;font-family:'Kalam',cursive;box-shadow:1.5px 1.5px 0 var(--ink);}
+.btn:hover{background:var(--warm);}
+.btn.p{background:var(--ink);color:#fff;box-shadow:1.5px 1.5px 0 var(--acc);}
+.btn.p:hover{background:var(--acc);}
+.btn.ml{margin-left:auto;}
 .plyr{height:180px;background:#1a1a1a;color:#fff;position:relative;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;cursor:pointer;}
 .plyr::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:22px solid #fff;border-top:14px solid transparent;border-bottom:14px solid transparent;opacity:.9;}
 .plyr .ctrl{position:absolute;bottom:0;left:0;right:0;height:20px;background:#111;border-top:1px solid #333;display:flex;align-items:center;gap:7px;padding:0 8px;font-size:9.5px;color:#aaa;}
+
+/* auth gate */
+.auth{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:var(--paper);}
+.auth .brand-big{font-family:'Caveat',cursive;font-size:42px;font-weight:700;letter-spacing:-.01em;margin-bottom:18px;}
+.auth .qprompt{margin:0 0 6px;}
+.auth .sub{text-align:center;color:#555;font-family:'Kalam',cursive;font-size:13px;}
+.auth .fld{width:320px;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;}
+.auth .go{min-width:320px;margin-top:4px;}
+.auth .go.ghost{background:transparent;color:var(--ink);box-shadow:2px 2px 0 var(--ink);}
+.auth .go.ghost:hover{background:var(--warm);color:var(--ink);box-shadow:2px 2px 0 var(--acc);}
+.auth .auth-back{margin-top:12px;font-family:'Kalam',cursive;font-size:12px;color:#777;cursor:pointer;}
+.auth .auth-back:hover{color:var(--ink);}
+
+/* post state: raw viewer + always-on timeline wireframe (split roughly 50/50) */
+.viewer-wrap{flex:1 1 50%;min-height:0;padding:16px 18px;display:flex;box-sizing:border-box;}
+.viewer{flex:1;min-height:0;background:#1a1a1a;color:#fff;position:relative;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;}
+.viewer::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:22px solid #fff;border-top:14px solid transparent;border-bottom:14px solid transparent;opacity:.9;}
+.viewer.empty{background:var(--warm);color:#999;font-family:'Kalam',cursive;font-size:13px;}
+.viewer.empty::before{display:none;}
+.viewer .ctrl{position:absolute;bottom:0;left:0;right:0;height:22px;background:#111;border-top:1px solid #333;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:10px;color:#aaa;}
+.tl{flex:1 1 50%;min-height:0;border-top:1.2px solid var(--ink);background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(0,0,0,.04) 8px 9px);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#888;letter-spacing:.08em;text-transform:uppercase;}
+
+/* transcript tab wireframe */
+.tr-scroll{overflow-y:auto;background:var(--paper);}
+.tr-pad{padding:18px 22px 32px;display:flex;flex-direction:column;gap:16px;max-width:720px;margin:0 auto;}
+.tr-line{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:4px 6px;border-left:2px solid transparent;}
+.tr-line:hover{border-left-color:var(--acc);background:rgba(0,0,0,.02);}
+.tr-meta{display:flex;align-items:baseline;gap:10px;}
+.tr-sp{font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:var(--ink);}
+.tr-ts{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#888;letter-spacing:.04em;}
+.tr-text{font-family:'Kalam',cursive;font-size:14px;line-height:1.55;color:#222;}
 .ac .ph{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.08) 6px 7px),var(--warm);border:1.2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;padding:4px;height:70px;}
 
 /* running animation */
@@ -241,12 +343,15 @@ body{display:flex;flex-direction:column;min-height:100vh;}
   <span class="sp"></span>
   <span>start state:</span>
   <span class="grp" id="state-grp">
-    <b data-state="first" class="on">first-run</b>
+    <b data-state="auth" class="on">auth</b>
+    <b data-state="first">first-run</b>
     <b data-state="returning">returning</b>
     <b data-state="shared">shared-link</b>
   </span>
   <button class="x" id="reset">⟲ reset</button>
+  <button class="x" id="immersive" title="Full-screen preview">⛶ immersive</button>
 </div>
+<div id="exit-immersive" title="Exit full-screen">✕</div>
 
 <!-- main frame hosts whichever tab is active -->
 <div class="frame" id="frame"></div>
@@ -259,6 +364,18 @@ body{display:flex;flex-direction:column;min-height:100vh;}
     <div class="actions">
       <button id="pm-other">Try other stuff</button>
       <button class="p" id="pm-upgrade">Upgrade membership →</button>
+    </div>
+  </div>
+</div>
+
+<!-- sign-in modal (shared-link → remix growth funnel) -->
+<div class="modal" id="signin-modal">
+  <div class="box">
+    <h3>Sign in to keep editing.</h3>
+    <p>We'll save your version so you can pick up where you left off — and share it when you're done.</p>
+    <div class="actions">
+      <button id="si-close">Maybe later</button>
+      <button class="p" id="si-continue">Continue with Google →</button>
     </div>
   </div>
 </div>
@@ -276,7 +393,7 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 const SCENARIOS = [
   {id:'talking-head',    t:'Edit talking head videos', d:"that I've already shot"},
   {id:'motion-graphics', t:'Make motion graphics',     d:'Title cards, data visualizations, lower-thirds'},
-  {id:'url-to-ads',      t:'I want a realistic UGC ad for my product',  d:'with just a URL or product photos'},
+  {id:'url-to-ads',      t:'Create a realistic UGC ad for my product',  d:'from a URL or product photos'},
   {id:'video-gen',       t:'Generate AI videos',       d:'Jaw-dropping cinematic videos, powered by Seedance 2.0', pro:true},
   {id:'voiceover',       t:'Generate voice narration',  d:'Script → voice'},
   {id:'music-gen',       t:'Generate music',           d:'Describe the mood. Copyright-free.'},
@@ -333,10 +450,19 @@ const PRESETS = {
     {id:'custom',      name:'+ your own',  dash:true},
   ],
   'video-gen':[
-    {id:'cinematic', name:'Cinematic',cls:'th-ai'},
-    {id:'product',   name:'Product',  cls:'th-ugc'},
-    {id:'anime',     name:'Anime',    cls:'th-head'},
-    {id:'doc',       name:'Docu',     cls:'th-mg'},
+    {id:'d4404826', name:'Product Launch Ad',              cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/d4404826-a3cd-4f72-ac0c-9875c26ba07d/cover/d773ed07-e31e-47e6-b9ae-eaadd6f2f9bf-jimeng-2026-04-02-8603-__________________________________logo__....png', pro:false},
+    {id:'4d157b2c', name:'Storyboard to Film',             cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/4d157b2c-9261-4a32-bfd2-0a7c0d04a2fe/cover/bcdb0603-6e99-4fdd-9c80-3cf3353bc8b9-cover.png', pro:true},
+    {id:'abae28f1', name:'Transformer is Here!',           cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/abae28f1-c55d-4dd8-af7b-aebd330c53fb/cover/e45db7b8-bea2-4d44-b7b4-82a8b14a8c3d-cover.png', pro:true},
+    {id:'44ce7ebb', name:'My Character in a Hero Scene',   cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/44ce7ebb-4b37-435f-acb1-9fba31e9fb3d/cover/ef16090f-3e5e-4867-9342-97ed68e0de76-cover.png', pro:true},
+    {id:'a4acd454', name:'Cinematic Logo Animation',       cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/a4acd454-d87e-4d7a-9eb1-9a71084d38dd/cover/d9e3313d-c8e5-4b80-95ab-0abda858f2e4-cover.PNG', pro:true},
+    {id:'5641a5c8', name:'Comic to Live-Action Film',      cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/5641a5c8-a8c3-4a7b-821f-8a47f8a56165/cover/9585f216-8713-40ca-9e5f-8bce82051691-cover.png', pro:true},
+    {id:'ba023432', name:'My Product is in Times Square!', cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/ba023432-3975-4787-beb0-cdcfc3542fba/cover/15b89d7c-ad75-4679-a431-fd3f23ccea0a-cover.png', pro:true},
+    {id:'fc4e6c02', name:'Glitch Logo Animation',          cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/fc4e6c02-072d-4958-a3d3-9f90fe7ebee7/cover/b80ccbe2-b291-4e36-9d81-37ada09925a9-cover.png', pro:true},
+    {id:'714c8bca', name:'Liquid Logo Animation',          cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/714c8bca-1b8c-4116-bb57-ada20890de94/cover/24527f12-a9bd-4041-a658-92bcaee9de01-cover.png', pro:true},
+    {id:'158a512d', name:'ASMR Product Video',             cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/158a512d-db53-44d4-b7bc-8717df6a49fe/cover/2b4c3620-32fe-4c69-af56-0123fec7e3d7-cover.png', pro:true},
+    {id:'b132219a', name:'Premium Hair Care Ad',           cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/b132219a-03c4-417a-a9a1-a6b06a796411/cover/7607aad5-6c9e-4800-8479-00c7514adaea-cover.png', pro:true},
+    {id:'68323c16', name:'Cat & Dog Podcast Skit',         cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/68323c16-db0e-42e6-b528-46329affb510/cover/4cf50a8a-654e-461b-adc6-96c54b4bc744-cover.png', pro:true},
+    {id:'8f627e2f', name:'3 Frames → One-Shot',            cover:'https://chatcut-production-mainbucketbucket-oxvbnfsx.s3.us-east-1.amazonaws.com/scenario-presets/8f627e2f-2e06-493b-b41e-1d2389dbb44f/cover/74f02d4f-5d98-4228-8bc2-333cd84d4018-cover.png', pro:true},
   ],
 };
 
@@ -372,24 +498,24 @@ const BRANCH_COPY = {
     placeholder:TH_DEFAULT_PROMPT,
   },
   'motion-graphics':{
-    hello:'Pick a template, or make your own.',
-    placeholder:'animated lower-third with my logo + name + role',
+    hello:'Alright, what motion graphic would you like?',
+    placeholder:'I can generate any motion graphic you describe. Stuck for words? Pick one of the templates below as a reference.',
   },
   'url-to-ads':{
-    hello:'Drop a product link, or images + info.',
+    hello:'Sweet — give me a URL, product photos, or both.',
     placeholder:'make it playful, 15 seconds, for instagram',
   },
   'video-gen':{
-    hello:'Describe what you want to see.',
+    hello:'Ready to roll, director. What\'s the shot?',
     placeholder:'a cinematic slow-mo pour of neon blue liquid into a frosted glass, macro lens, studio light',
   },
   'voiceover':{
-    hello:'Paste a script, or describe the voice you want.',
-    placeholder:'If you\'ve ever tried to edit a 45-min interview to 60 seconds…',
+    hello:"Give me a topic or a script, and I'll narrate it.",
+    placeholder:'the future of AI narration, 60 seconds — warm and curious',
   },
   'music-gen':{
-    hello:'Describe the mood, genre, and length.',
-    placeholder:'upbeat indie-pop bed, 45 seconds, builds at 0:20',
+    hello:'What kind of music would you like to hear?',
+    placeholder:'upbeat indie-pop, warm and optimistic, light percussion',
   },
 };
 
@@ -403,6 +529,10 @@ const state = {
   activeTabId:null,
   galleryTab:'Recent',
   tabCounter:1,
+  profileOpen:false,
+  authStep:'gate',          // 'gate' | 'email' | 'verify' | null (null = authed)
+  authMode:null,            // 'signup' | 'login'
+  authEmail:'',
 };
 
 function freshCreatorTab(){
@@ -415,6 +545,7 @@ function freshCreatorTab(){
     selectedPreset:null,
     mgCategory:'all',
     promptText:'',
+    noteOpen:false,
     projectName:'Untitled project',
     sourceAttached:false,
     cutReady:false,
@@ -444,9 +575,51 @@ function reset(){
 function $(sel){return document.querySelector(sel);}
 function curTab(){return state.tabs.find(t=>t.id===state.activeTabId);}
 
+function renderAuth(){
+  if(state.authStep === 'gate'){
+    return `
+      <div class="auth">
+        <div class="brand-big">ChatCut</div>
+        <button class="go" data-action="auth-signup">Sign up</button>
+        <button class="go ghost" data-action="auth-login">Log in</button>
+      </div>
+    `;
+  }
+  if(state.authStep === 'email'){
+    return `
+      <div class="auth">
+        <div class="brand-big">ChatCut</div>
+        <div class="qprompt">What's your email?</div>
+        <input class="fld" data-field="auth-email" placeholder="you@example.com" value="${escapeHtml(state.authEmail)}" autofocus>
+        <button class="go" data-action="auth-email-next">Continue</button>
+        <div class="auth-back" data-action="auth-back">← back</div>
+      </div>
+    `;
+  }
+  if(state.authStep === 'verify'){
+    return `
+      <div class="auth">
+        <div class="brand-big">ChatCut</div>
+        <div class="qprompt">Check your email for a code.</div>
+        <div class="sub">We sent it to ${escapeHtml(state.authEmail || 'your email')}</div>
+        <input class="fld" data-field="auth-code" placeholder="6-digit code">
+        <button class="go" data-action="auth-verify-next">Continue</button>
+        <div class="auth-back" data-action="auth-back">← back</div>
+      </div>
+    `;
+  }
+  return '';
+}
+
 function renderFrame(){
-  const t = curTab();
   const f = $('#frame');
+  if(state.authStep){
+    f.innerHTML = renderAuth();
+    const autof = f.querySelector('[autofocus]');
+    if(autof) autof.focus();
+    return;
+  }
+  const t = curTab();
   if(!t){ f.innerHTML=''; return; }
   // If the prompt textarea is focused, preserve its live DOM content across the re-render —
   // otherwise toggling a chip mid-typing would wipe/caret-jump the field.
@@ -476,42 +649,74 @@ function renderFrame(){
 }
 
 function renderHome(t){
-  const crtBody = t.phase==='creator'
-    ? renderIntentGrid(t)
-    : renderBranchBody(t);
-
-  // Unified rule: no projects → no sidebar, single centered column.
-  // In the prototype, first-run means zero projects; returning means has projects.
-  const welcome = state.startState==='first';
-  const bodyCls = welcome ? 'h-body welcome' : 'h-body';
-  const crtCls  = welcome ? 'crt centered'  : 'crt';
-
-  const h1Html = t.phase==='creator'
-    ? ''
-    : `<div class="back-top" data-action="back">← back</div>`;
+  const crtBody = t.phase==='creator' ? renderIntentGrid(t) : renderBranchBody(t);
+  const hasGallery = state.startState !== 'first';
+  const isSplit = t.phase==='branch' && (t.scenarioId==='motion-graphics' || t.scenarioId==='video-gen');
 
   return `
     ${renderTopBar(t)}
-    <div class="${bodyCls}">
-      <div class="${crtCls}">
-        ${h1Html}
+    <div class="h-body${hasGallery ? '' : ' solo'}">
+      ${t.phase==='creator' ? '' : `<div class="back-top" data-action="back">← back</div>`}
+      <div class="crt${isSplit ? ' split' : ''}">
         ${crtBody}
       </div>
-      ${welcome ? '' : renderGallery()}
+      ${hasGallery ? renderGallery() : ''}
     </div>
   `;
 }
 
 function renderTopBar(t){
-  const rightBits = t.phase==='creator' || t.phase==='branch'
-    ? `<span class="pill">free plan</span><span class="pill">kw@chatcut</span>`
-    : `<button class="newbtn" data-action="share">Share</button>`;
+  const preProject = t.phase === 'creator' || t.phase === 'branch' || t.phase === 'chat-intro';
+  const profileBtn = `<button class="profile-btn" data-action="toggle-profile"><span class="av">K</span><span class="cred"><span class="sp">⚡</span>500</span></button>`;
+  if(preProject){
+    return `
+      <div class="top-float">
+        ${profileBtn}
+        ${state.profileOpen ? renderProfileMenu() : ''}
+      </div>`;
+  }
+  // Post phase: no shared top bar. Chrome (home/export/profile) moves into the per-panel tab bars.
+  if(t.phase === 'post'){
+    return '';
+  }
+  const showProjectName = t.projectName && t.projectName !== 'New project';
+  const center = showProjectName
+    ? `<div class="top-center">${escapeHtml(t.projectName)}</div>`
+    : `<div></div>`;
   return `
     <div class="top">
-      <div class="home" data-action="home"><span class="ic">⌂</span>Home</div>
-      <span class="sp"></span>
-      ${rightBits}
+      <div class="top-left"><div class="home" data-action="home" title="Home"><span class="ic">⌂</span></div></div>
+      ${center}
+      <div class="top-right">${profileBtn}</div>
+      ${state.profileOpen ? renderProfileMenu() : ''}
     </div>`;
+}
+
+function renderProfileMenu(){
+  return `
+    <div class="profile-menu" data-stop>
+      <div class="hdr">
+        <div class="nm">Kaiwen</div>
+        <div class="em">kaiwen.cinema.li@gmail.com</div>
+      </div>
+      <div class="plan">
+        <div class="plan-row">
+          <div>
+            <div class="plan-lbl">current plan</div>
+            <div class="plan-bdg">Free</div>
+          </div>
+          <div class="upgrade" data-action="upgrade">Upgrade</div>
+        </div>
+        <div class="cred-row"><span><span class="sp">⚡</span>credits</span><span>500</span></div>
+      </div>
+      <div class="mi">Language <span class="sub">English ›</span></div>
+      <div class="mi">Feedback</div>
+      <div class="mi">Keyboard shortcuts</div>
+      <div class="mi">Manage subscription</div>
+      <hr/>
+      <div class="mi destroy" data-action="signout">Sign out</div>
+    </div>
+  `;
 }
 
 function renderIntentGrid(t){
@@ -525,7 +730,7 @@ function renderIntentGrid(t){
           <span class="d">${s.d}</span>
         </div>`).join('')}
     </div>
-    <div class="skip" data-action="skip">or just talk to me</div>
+    <div class="skip" data-action="skip">I know what I want</div>
   `;
 }
 
@@ -571,38 +776,25 @@ function renderBranchBody(t){
       </div>`;
     }).join('') + `<div class="preset dash ${t.selectedPreset==='custom'?'on':''}" data-preset="custom"><span class="b">+ describe your own</span></div>`;
     body = `
-      <div class="lbl">browse templates · ${all.length} popular</div>
       <div class="chips" style="margin-bottom:6px;">${catChips}</div>
       <div class="presets">${tiles}</div>
     `;
   }
   else if(t.scenarioId==='url-to-ads'){
     body = `
-      <div class="lbl">product URL</div>
-      <div class="fld" contenteditable="true" data-field="url">https://rallyenergy.com/pineapple-mint</div>
-      <div class="lbl">or drop product images + info</div>
-      <div class="drop" data-action="attach">drop images — we'll extract copy &amp; style</div>
-      <div class="lbl">ad format</div>
-      <div class="presets">
-        ${PRESETS['url-to-ads'].map(p=>`
-          <div class="preset ${p.dash?'dash':''} ${t.selectedPreset===p.id?'on':''}" data-preset="${p.id}" ${p.cls?`style="background-image:linear-gradient(160deg,${pickGrad(p.cls)[0]},${pickGrad(p.cls)[1]});"`:''}>
-            <span class="b">${p.name}</span>
-          </div>`).join('')}
+      <div class="ugc-grid">
+        <div class="fld" contenteditable="true" data-field="url">https://rallyenergy.com/pineapple-mint</div>
+        <div class="ugc-or"><span>or</span></div>
+        <div class="drop" data-action="attach">drop product photos<div class="drop-sub">we'll extract copy &amp; style</div></div>
       </div>
     `;
   }
   else if(t.scenarioId==='video-gen'){
     body = `
-      <div class="lbl">model (free · or upgrade for Seedance 2.0)</div>
-      <div class="chips" id="model-chips">
-        <span class="c ${t.selectedChips['veo']?'on':'on'}" data-chip="veo" data-group="model">Veo 2</span>
-        <span class="c ${t.selectedChips['kling']?'on':''}" data-chip="kling" data-group="model">Kling 1.6</span>
-        <span class="c pro-chip" data-chip="seedance" data-pro="1">⚡ Seedance 2.0 <span class="tag">PRO</span></span>
-      </div>
-      <div class="lbl">preset style</div>
       <div class="presets">
         ${PRESETS['video-gen'].map(p=>`
-          <div class="preset ${t.selectedPreset===p.id?'on':''}" data-preset="${p.id}" style="background-image:linear-gradient(160deg,${pickGrad(p.cls)[0]},${pickGrad(p.cls)[1]});">
+          <div class="preset ${t.selectedPreset===p.id?'on':''}" data-preset="${p.id}" style="background-image:url('${p.cover}');background-size:cover;background-position:center;">
+            ${p.pro?`<span class="pro" style="top:4px;right:4px;font-size:7px;padding:1px 4px;">PRO</span>`:''}
             <span class="b">${p.name}</span>
           </div>`).join('')}
       </div>
@@ -610,41 +802,80 @@ function renderBranchBody(t){
   }
   else if(t.scenarioId==='voiceover'){
     body = `
-      <div class="lbl">voice</div>
       <div class="chips">
-        <span class="c ${t.selectedChips['v1']?'on':'on'}" data-chip="v1">Warm male · US</span>
-        <span class="c ${t.selectedChips['v2']?'on':''}" data-chip="v2">Warm female · US</span>
-        <span class="c ${t.selectedChips['v3']?'on':''}" data-chip="v3">British · doc</span>
-        <span class="c ${t.selectedChips['v4']?'on':''}" data-chip="v4">+ clone yours</span>
-      </div>
-    `;
-  }
-  else if(t.scenarioId==='music-gen'){
-    body = `
-      <div class="lbl">reference track (optional)</div>
-      <div class="drop" data-action="attach">drop .mp3 / paste Spotify link</div>
-      <div class="lbl">use case</div>
-      <div class="chips">
-        ${[['bed','Bed under VO'],['sting','Sting'],['intro','Intro theme'],['bg','Background loop']].map(([id,n],i)=>
-          `<span class="c ${t.selectedChips[id]||(i===0&&!Object.keys(t.selectedChips).length)?'on':''}" data-chip="${id}">${n}</span>`
-        ).join('')}
+        <span class="c ${t.selectedChips['v1']?'on':''}" data-chip="v1" data-group="voice">Jon · warm male</span>
+        <span class="c ${t.selectedChips['v2']?'on':''}" data-chip="v2" data-group="voice">Hope · upbeat female</span>
+        <span class="c ${t.selectedChips['v3']?'on':''}" data-chip="v3" data-group="voice">Jane · British</span>
+        <span class="c ${t.selectedChips['v4']?'on':''}" data-chip="v4" data-group="voice">+ clone yours</span>
       </div>
     `;
   }
 
-  const subHtml = t.scenarioId==='talking-head' ? '' : `<div class="sub">${copy.hello}</div>`;
-  const isTHWaiting = t.scenarioId==='talking-head' && !t.sourceAttached;
-  const thLeadIn = t.scenarioId==='talking-head' ? `<div class="sub" style="margin:8px 0 -2px;">Cool. Tell me how you want it edited.</div>` : '';
-  const promptLbl = t.scenarioId==='talking-head' ? '' : `<div class="lbl">${t.scenarioId==='voiceover'?'script':(t.scenarioId==='music-gen'?'describe':'describe what you want')}</div>`;
+  if(t.scenarioId==='motion-graphics' || t.scenarioId==='video-gen'){
+    let picked = null;
+    if(t.scenarioId==='motion-graphics' && t.selectedPreset && t.selectedPreset!=='custom'){
+      picked = PRESETS['motion-graphics'].find(p=>p.id===t.selectedPreset);
+    } else if(t.scenarioId==='video-gen' && t.selectedPreset){
+      picked = PRESETS['video-gen'].find(p=>p.id===t.selectedPreset);
+    }
+    let refHtml = '';
+    if(picked){
+      let thumbStyle = '';
+      if(t.scenarioId==='motion-graphics'){
+        const g = pickGrad(MG_CAT_GRAD[picked.cat]);
+        thumbStyle = `background-image:linear-gradient(135deg,${g[0]},${g[1]});`;
+      } else if(picked.cover){
+        thumbStyle = `background-image:url('${picked.cover}');`;
+      }
+      refHtml = `
+        <div class="split-ref">
+          <span class="thumb" style="${thumbStyle}"></span>
+          <span class="nm">Reference: ${picked.name}</span>
+          <span class="rm" data-action="clear-preset">✕</span>
+        </div>
+      `;
+    }
+    return `
+      <div class="split-top">
+        <div class="qprompt">${copy.hello}</div>
+        ${refHtml}
+        <div class="fld area" contenteditable="true" data-field="prompt" data-placeholder="${copy.placeholder}">${escapeHtml(t.promptText) || `<span style="color:#999">${copy.placeholder}</span>`}</div>
+        <div class="go" data-action="create">${startLabel(t.scenarioId, s.pro)}</div>
+      </div>
+      <div class="split-bot">
+        ${body}
+      </div>
+    `;
+  }
+
+  const isTH = t.scenarioId==='talking-head';
+  const hello = isTH ? '' : `<div class="qprompt">${copy.hello}</div>`;
+  const thLeadIn = isTH ? `<div class="qprompt" style="margin:8px 0 -2px;">Cool. Tell me how you want it edited.</div>` : '';
+  const hidePrompt = isTH && !t.sourceAttached;
+
+  if(t.scenarioId==='url-to-ads'){
+    const noteBtn = t.noteOpen
+      ? `<div class="ugc-note-btn" data-action="toggle-note">– Hide note</div>`
+      : `<div class="ugc-note-btn" data-action="toggle-note"><u>+ Add a note</u> (optional)</div>`;
+    const noteField = t.noteOpen
+      ? `<div class="fld area" contenteditable="true" data-field="prompt" data-placeholder="${copy.placeholder}">${escapeHtml(t.promptText) || `<span style="color:#999">${copy.placeholder}</span>`}</div>`
+      : '';
+    return `
+      ${hello}
+      ${body}
+      ${noteBtn}
+      ${noteField}
+      <div class="go" data-action="create">${startLabel(t.scenarioId, s.pro)}</div>
+    `;
+  }
 
   return `
-    ${subHtml}
+    ${hello}
     ${body}
-    ${isTHWaiting ? '' : `
+    ${hidePrompt ? '' : `
       ${thLeadIn}
-      ${postPrompt}
-      ${promptLbl}
       <div class="fld area" contenteditable="true" data-field="prompt" data-placeholder="${copy.placeholder}">${escapeHtml(t.promptText) || `<span style="color:#999">${copy.placeholder}</span>`}</div>
+      ${postPrompt}
       <div class="go" data-action="create">${startLabel(t.scenarioId, s.pro)}</div>
     `}
   `;
@@ -755,20 +986,19 @@ function emptyGalleryHtml(title, sub, cta){
   `;
 }
 
-// ── CHAT-INTRO surface — centered input, pre-first-send
 function renderChatIntro(t){
-  const welcome = state.startState === 'first';
-  const bodyCls = welcome ? 'h-body welcome' : 'h-body';
+  const hasGallery = state.startState !== 'first';
+  const bodyCls = hasGallery ? 'h-body' : 'h-body solo';
   const ph = 'Add media and describe your edits, or just say what you want to make';
   return `
     ${renderTopBar(t)}
     <div class="${bodyCls}">
-      <div class="intro-col">
-        <div class="back-top" data-action="back">← back</div>
-        <div class="qprompt">What do you want to make?</div>
+      <div class="back-top" data-action="back">← back</div>
+      <div class="crt">
+        <div class="qprompt">Hi, what do you want to make today?</div>
         ${renderComposer({placeholder:ph, action:'chatintro-send', large:true, value:t.promptText})}
       </div>
-      ${welcome ? '' : renderGallery()}
+      ${hasGallery ? renderGallery() : ''}
     </div>
   `;
 }
@@ -788,35 +1018,116 @@ function renderComposer({placeholder, action, large, value}){
   `;
 }
 
-// ── CHAT-LIVE surface — chat started, editor not yet revealed
 function renderChatLive(t){
-  const welcome = state.startState === 'first';
-  if(welcome){
-    return `
-      ${renderTopBar(t)}
-      <div class="p-body" style="grid-template-columns:1fr;">
-        <div class="chat" style="border-right:none;max-width:680px;margin:0 auto;width:100%;">${renderChat(t)}</div>
-      </div>
-    `;
-  }
+  const hasGallery = state.startState !== 'first';
+  const bodyCls = hasGallery ? 'h-body' : 'h-body solo';
   return `
     ${renderTopBar(t)}
-    <div class="p-body" style="grid-template-columns:400px 1fr;">
+    <div class="${bodyCls}">
       <div class="chat">${renderChat(t)}</div>
-      ${renderGallery()}
+      ${hasGallery ? renderGallery() : ''}
     </div>
   `;
 }
 
 // ── PROJECT surface
 function renderProject(t){
+  const hasRightPanel = t.phase === 'post';
+  const bodyCls = hasRightPanel ? 'p-body' : 'p-body solo';
+  const leftTabBar = hasRightPanel ? renderLeftTabBar(t) : '';
+  const rightTabBar = hasRightPanel ? renderRightTabBar(t) : '';
+  const topBar = hasRightPanel ? '' : renderTopBar(t);
   return `
-    ${renderTopBar(t)}
-    <div class="p-body">
-      <div class="chat">${renderChat(t)}</div>
-      <div class="art">${renderArtifact(t)}</div>
+    ${topBar}
+    <div class="${bodyCls}">
+      <div class="chat">${leftTabBar}${renderChat(t)}</div>
+      ${hasRightPanel ? `<div class="art with-tabs">${rightTabBar}${renderRightPanel(t)}</div>` : ''}
     </div>
   `;
+}
+
+// Per-panel tab bar — mirrors the .gtabs design from the home page gallery.
+// Left panel: home button + AI tab. Dividing line comes from the container's border-bottom.
+function renderLeftTabBar(t){
+  return `
+    <div class="panel-tab-bar">
+      <div class="panel-tabs">
+        <div class="home" data-action="home" title="Home"><span class="ic">⌂</span></div>
+        <div class="tab on" data-left-tab="ai">AI</div>
+      </div>
+    </div>
+  `;
+}
+
+// Right panel tab bar: Media (anchor) + named timeline + Export/profile on the far right.
+function renderRightTabBar(t){
+  const active = t.activeRightTab || 'timeline';
+  const projectName = synthesizeProjectName(t) || 'Timeline';
+  const profileBtn = `<button class="profile-btn" data-action="toggle-profile"><span class="av">K</span><span class="cred"><span class="sp">⚡</span>500</span></button>`;
+  return `
+    <div class="panel-tab-bar">
+      <div class="panel-tabs">
+        <div class="tab${active==='media'?' on':''}" data-right-tab="media">🎞️ Media</div>
+        <div class="tab${active==='transcript'?' on':''}" data-right-tab="transcript">📝 Transcript</div>
+        <div class="tab${active==='timeline'?' on':''}" data-right-tab="timeline" title="${escapeHtml(projectName)}">${escapeHtml(projectName)}</div>
+      </div>
+      <div class="panel-tab-right">
+        <button class="newbtn" data-action="share">Export</button>
+        ${profileBtn}
+        ${state.profileOpen ? renderProfileMenu() : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderRightPanel(t){
+  const active = t.activeRightTab || 'timeline';
+  if(active === 'media') return renderMediaTab(t);
+  if(active === 'transcript') return renderTranscriptTab(t);
+  return renderTimelineTab(t);
+}
+
+function renderTranscriptTab(t){
+  const lines = [
+    {sp:'Kaiwen',    ts:'00:00', text:"So I've been working on this project for a while now, and the thing that keeps striking me is how hard it is to talk about something before you've actually built it."},
+    {sp:'Kaiwen',    ts:'00:12', text:"You end up with a wall of words, and nobody quite sees what you're seeing. That's the gap we've been trying to close."},
+    {sp:'Interviewer',ts:'00:23', text:"Yeah. And the idea is that you just… speak, and the thing figures out what to show?"},
+    {sp:'Kaiwen',    ts:'00:29', text:"Exactly. You describe the cut you want, and it happens. No dragging clips on a timeline, no poking at transitions for forty minutes."},
+    {sp:'Kaiwen',    ts:'00:38', text:"We think that's where editing is going, honestly. The interface is a conversation, not a timeline. The timeline is just the receipt."},
+  ];
+  const body = lines.map(l=>`
+    <div class="tr-line">
+      <div class="tr-meta"><span class="tr-sp">${escapeHtml(l.sp)}</span><span class="tr-ts">${l.ts}</span></div>
+      <div class="tr-text">${escapeHtml(l.text)}</div>
+    </div>
+  `).join('');
+  return `<div class="tab-body tr-scroll"><div class="tr-pad">${body}</div></div>`;
+}
+
+function renderTimelineTab(t){
+  return `<div class="tab-body">${renderPostArtifact(t)}</div>`;
+}
+
+function renderMediaTab(t){
+  const SOURCES = {
+    'talking-head': [{name:'interview-final.mp4', meta:'video · 08:42 · 1.2 GB', ic:'🎬'}],
+    'motion-graphics': [{name:'logo.svg', meta:'vector · brand kit', ic:'🖼️'},{name:'kit-colors.json', meta:'style tokens', ic:'🎨'}],
+    'url-to-ads': [{name:'rallyenergy.com', meta:'url · 4 images scraped', ic:'🔗'},{name:'hero-product.jpg', meta:'image · 680 KB', ic:'🖼️'}],
+    'voiceover': [{name:'script.txt', meta:'text · 430 words', ic:'📝'}],
+    'video-gen': [],
+    'music-gen': [],
+  };
+  const items = SOURCES[t.scenarioId] || [];
+  const itemsHtml = items.map(i=>`
+    <div class="media-item">
+      <span class="media-ic">${i.ic}</span>
+      <div><b>${escapeHtml(i.name)}</b><span class="meta">${escapeHtml(i.meta)}</span></div>
+    </div>
+  `).join('');
+  const hint = items.length
+    ? `<div class="drop-hint">drop files to add, or let the AI pull them in</div>`
+    : `<div class="drop-hint">no source files — everything here is AI-generated</div>`;
+  return `<div class="tab-body media">${itemsHtml}${hint}</div>`;
 }
 
 function renderChat(t){
@@ -831,9 +1142,10 @@ function renderChat(t){
   } else if(isChatLive){
     msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>On it — give me a moment…</div>`);
   } else if(t.phase==='reveal'){
-    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Got it. I turned that into a structured prompt — review &amp; run, or tweak it.</div>`);
+    const prompt = composePrompt(t);
+    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Here's the plan — edit any line, or run it.<div class="promptbox" style="margin-top:6px;">${prompt}</div><div class="row" style="margin-top:6px;"><button class="btn" data-action="edit-prompt">✎ Edit</button><button class="btn p ml" data-action="run">Run plan ▶</button></div></div>`);
   } else if(t.phase==='running'){
-    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Running…</div>`);
+    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Running your plan…<div style="font-size:11px;color:#777;margin-top:4px;font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;">transcribing · picking moments · rendering</div></div>`);
   } else if(t.phase==='post'){
     msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Done — ${scenarioOutputLabel(t.scenarioId)}. Play, export, or ask for a change.</div>`);
   }
@@ -934,11 +1246,11 @@ function composePrompt(t){
 <span class="k">duration:</span>  8s · 1080p · 24fps`;
   }
   if(t.scenarioId==='voiceover'){
+    const voiceName = t.selectedChips['v4']?'Voice clone':t.selectedChips['v3']?'Jane':t.selectedChips['v2']?'Hope':'Jon';
     return `<span class="k">intent:</span>  generate voiceover
-<span class="k">voice:</span>   Warm male · US
+<span class="k">voice:</span>   ${voiceName}
 <span class="k">script:</span>  ${escapeHtml((t.promptText||BRANCH_COPY.voiceover.placeholder)).slice(0,80)}…
-<span class="k">pace:</span>    natural · 160wpm
-<span class="k">output:</span>  WAV · 48kHz mono`;
+<span class="k">output:</span>  MP3 · 44kHz · 128kbps`;
   }
   if(t.scenarioId==='music-gen'){
     return `<span class="k">intent:</span>  generate music
@@ -951,28 +1263,16 @@ function composePrompt(t){
 }
 
 function renderPostArtifact(t){
+  const timeline = `<div class="tl">timeline tracks</div>`;
   if(!t.cutReady){
     return `
-      <div class="ac" style="border-style:dashed;background:transparent;box-shadow:none;">
-        <div class="h"><span class="t">empty canvas</span><span class="m">nothing here yet</span></div>
-        <div class="ph" style="padding:28px 18px;text-align:center;line-height:1.5;">
-          your timeline is blank.<br>
-          <span style="color:#777;font-size:12px;">drop footage into the editor · or ask the chat to make something from scratch</span>
-        </div>
-      </div>
+      <div class="viewer-wrap"><div class="viewer empty">your timeline is blank</div></div>
+      ${timeline}
     `;
   }
   return `
-    <div class="ac acc">
-      <div class="h"><span class="t">▶ ${scenarioOutputTitle(t.scenarioId)}</span><span class="m">pinned · ready</span></div>
-      <div class="plyr"><div class="ctrl">◀◀ ▶ ▶▶ 0:12 / ${scenarioDur(t.scenarioId)} ——●———————— ⟲ ⤢</div></div>
-      <div class="row">
-        <button class="btn">📝 transcript</button>
-        <button class="btn">▦ timeline</button>
-        <button class="btn">↗ share</button>
-        <button class="btn p ml" data-action="export">⤓ Export</button>
-      </div>
-    </div>
+    <div class="viewer-wrap"><div class="viewer"><div class="ctrl">◀◀ ▶ ▶▶ 0:12 / ${scenarioDur(t.scenarioId)} ——●———————— ⟲ ⤢</div></div></div>
+    ${timeline}
   `;
 }
 function scenarioOutputTitle(id){
@@ -986,17 +1286,19 @@ function scenarioDur(id){
 function renderSharedLink(){
   return `
     <div class="ro-banner">
-      <span class="pill">READ-ONLY</span>
       <span>Shared by <b>Kai</b> · Founder interview · 60s</span>
       <span class="sp" style="flex:1;"></span>
-      <button class="newbtn" data-action="fork">↗ Fork to my projects</button>
+      <button class="newbtn" data-action="remix">↗ Remix this</button>
       <button class="newbtn" data-action="signin">⊕ Sign in</button>
     </div>
     <div class="p-body">
       <div class="chat">
         <div class="msgs">
-          <div class="bub ai"><span class="nm">CHATCUT</span>Here's <b>Founder interview · 60s</b>. Kai shared it with you.</div>
-          <div class="bub ai" style="opacity:.65;font-size:11px;">… chat history hidden · click Fork to continue the conversation</div>
+          <div class="bub ai"><span class="nm">CHATCUT</span>Here's <b>Founder interview · 60s</b> — Kai shared this with you.</div>
+          <div class="bub ai"><span class="nm">CHATCUT</span>Want your own version? Tell me what you'd change — or remix as-is.</div>
+        </div>
+        <div class="comp">
+          ${renderComposer({placeholder:'what would you change?', action:'remix-send'})}
         </div>
       </div>
       <div class="art">
@@ -1004,7 +1306,7 @@ function renderSharedLink(){
           <div class="h"><span class="t">▶ cut v2 · 0:58</span><span class="m">pinned · exported</span></div>
           <div class="plyr"><div class="ctrl">0:12 / 0:58 ——●———————————</div></div>
           <div class="row">
-            <button class="btn" data-action="fork">↗ Fork</button>
+            <button class="btn" data-action="remix">↗ Remix</button>
             <button class="btn">💬 Comment</button>
             <button class="btn p ml">⤓ Download</button>
           </div>
@@ -1024,15 +1326,45 @@ function render(){
 document.addEventListener('click',e=>{
   const t = curTab();
 
+  // close profile menu on outside click
+  if(state.profileOpen && !e.target.closest('.profile-menu') && !e.target.closest('[data-action="toggle-profile"]')){
+    state.profileOpen = false;
+    render();
+  }
+
   // dev state grp
   const stateBtn = e.target.closest('#state-grp b');
   if(stateBtn){
-    state.startState = stateBtn.dataset.state;
+    const v = stateBtn.dataset.state;
     $$('#state-grp b').forEach(b=>b.classList.toggle('on', b===stateBtn));
+    if(v === 'auth'){
+      state.authStep = 'gate';
+      state.authMode = null;
+      state.authEmail = '';
+      state.tabs = [];
+      render();
+    } else {
+      state.authStep = null;
+      state.startState = v;
+      reset();
+    }
+    return;
+  }
+  if(e.target.id==='reset'){
+    if(state.authStep){ render(); return; }
     reset();
     return;
   }
-  if(e.target.id==='reset'){ reset(); return; }
+  if(e.target.id==='immersive'){
+    document.body.classList.add('immersive');
+    if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+    return;
+  }
+  if(e.target.id==='exit-immersive'){
+    document.body.classList.remove('immersive');
+    if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+    return;
+  }
 
   if(!t) return;
 
@@ -1047,6 +1379,7 @@ document.addEventListener('click',e=>{
     t.title = s.t;
     // Pre-fill talking-head with canonical default so chips reflect what's already "on"
     if(t.scenarioId==='talking-head' && !t.promptText) t.promptText = TH_DEFAULT_PROMPT;
+    if(t.scenarioId==='voiceover' && !t.selectedChips['v1'] && !t.selectedChips['v2'] && !t.selectedChips['v3'] && !t.selectedChips['v4']) t.selectedChips['v1']=true;
     render();
     return;
   }
@@ -1076,10 +1409,56 @@ document.addEventListener('click',e=>{
   }
   if(act==='back'){
     t.scenarioId=null; t.phase='creator'; t.title='New project';
-    t.sourceAttached=false; t.selectedChips={}; t.selectedPreset=null; t.mgCategory='all'; t.promptText='';
+    t.sourceAttached=false; t.selectedChips={}; t.selectedPreset=null; t.mgCategory='all'; t.promptText=''; t.noteOpen=false;
     render(); return;
   }
   if(act==='attach'){ t.sourceAttached = !t.sourceAttached; render(); return; }
+  if(act==='clear-preset'){ t.selectedPreset = null; render(); return; }
+  if(act==='toggle-note'){
+    const pe = document.querySelector('[data-field="prompt"]');
+    if(pe) t.promptText = (pe.innerText||'').trim();
+    t.noteOpen = !t.noteOpen;
+    render();
+    return;
+  }
+  if(act==='toggle-profile'){
+    e.stopPropagation();
+    state.profileOpen = !state.profileOpen;
+    render();
+    return;
+  }
+  if(act==='upgrade'){ state.profileOpen = false; render(); return; }
+  if(act==='auth-signup'){ state.authMode='signup'; state.authStep='email'; render(); return; }
+  if(act==='auth-login'){ state.authMode='login'; state.authStep='email'; render(); return; }
+  if(act==='auth-email-next'){
+    const inp = document.querySelector('[data-field="auth-email"]');
+    if(inp) state.authEmail = inp.value.trim();
+    state.authStep='verify';
+    render();
+    return;
+  }
+  if(act==='auth-verify-next'){
+    state.authStep=null;
+    state.startState = state.authMode==='signup' ? 'first' : 'returning';
+    state.authMode=null;
+    reset();
+    return;
+  }
+  if(act==='auth-back'){
+    if(state.authStep==='verify') state.authStep='email';
+    else if(state.authStep==='email') state.authStep='gate';
+    render();
+    return;
+  }
+  if(act==='signout'){
+    state.profileOpen=false;
+    state.authStep='gate';
+    state.authMode=null;
+    state.authEmail='';
+    state.tabs=[];
+    render();
+    return;
+  }
   if(act==='reset-th'){ t.promptText = TH_DEFAULT_PROMPT; render(); return; }
 
   // chips inside branch
@@ -1104,6 +1483,9 @@ document.addEventListener('click',e=>{
     }
     if(group==='model'){
       ['veo','kling','seedance'].forEach(k=>delete t.selectedChips[k]);
+      t.selectedChips[id]=true;
+    } else if(group==='voice'){
+      ['v1','v2','v3','v4'].forEach(k=>delete t.selectedChips[k]);
       t.selectedChips[id]=true;
     } else {
       t.selectedChips[id] = !t.selectedChips[id];
@@ -1138,6 +1520,14 @@ document.addEventListener('click',e=>{
   // gallery tab switch
   const gt = e.target.closest('[data-gtab]');
   if(gt){ state.galleryTab = gt.dataset.gtab; render(); return; }
+
+  // right-panel tab switch (Media / Timeline)
+  const rt = e.target.closest('[data-right-tab]');
+  if(rt){ t.activeRightTab = rt.dataset.rightTab; render(); return; }
+
+  // left-panel tab switch (AI / Transcript)
+  const lt = e.target.closest('[data-left-tab]');
+  if(lt){ t.activeLeftTab = lt.dataset.leftTab; render(); return; }
 
   // create project — go straight to running, skip the reveal/confirm layer
   if(act==='create'){
@@ -1181,8 +1571,8 @@ document.addEventListener('click',e=>{
     return;
   }
   if(act==='newtab'){ addTab(); return; }
-  if(act==='fork'){ flash('Fork → creates a copy in YOUR projects. You become a user.'); return; }
-  if(act==='signin'){ flash('Sign-in → existing Better-Auth. Then fork.'); return; }
+  if(act==='remix' || act==='remix-send' || act==='signin'){ openSignin(); return; }
+  if(act==='new-version'){ flash('New version → future: iterate the cut, opens as a new timeline tab.'); return; }
   if(act==='share'){ flash('Share → generates read-only link (see "shared-link" state above).'); return; }
 
   const refine = e.target.closest('[data-refine]');
@@ -1190,6 +1580,23 @@ document.addEventListener('click',e=>{
 
   const chatsend = e.target.closest('[data-action="chatsend"]');
   if(chatsend){ flash('Chat send — would add a new turn + artifact version.'); return; }
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Enter') return;
+  const field = e.target.dataset && e.target.dataset.field;
+  if(field === 'auth-email'){
+    e.preventDefault();
+    state.authEmail = e.target.value.trim();
+    state.authStep = 'verify';
+    render();
+  } else if(field === 'auth-code'){
+    e.preventDefault();
+    state.authStep = null;
+    state.startState = state.authMode==='signup' ? 'first' : 'returning';
+    state.authMode = null;
+    reset();
+  }
 });
 
 // capture contenteditable prompts
@@ -1223,6 +1630,11 @@ function openPremium(){ $('#premium-modal').classList.add('on'); }
 function closePremium(){ $('#premium-modal').classList.remove('on'); }
 $('#pm-other').onclick = ()=>{ closePremium(); };
 $('#pm-upgrade').onclick = ()=>{ closePremium(); flash('Upgrade flow — would open pricing dialog.'); };
+
+function openSignin(){ $('#signin-modal').classList.add('on'); }
+function closeSignin(){ $('#signin-modal').classList.remove('on'); }
+$('#si-close').onclick = ()=>{ closeSignin(); };
+$('#si-continue').onclick = ()=>{ closeSignin(); flash('Sign-in → Better Auth. Your version gets saved, then you land in the editor.'); };
 
 function synthesizeProjectName(t){
   const s = SCENARIOS.find(x=>x.id===t.scenarioId);
@@ -1272,6 +1684,10 @@ try{window.parent.postMessage({type:'__edit_mode_available'},'*');}catch(e){}
 // ── util
 function $$(s){return [...document.querySelectorAll(s)];}
 function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+document.addEventListener('fullscreenchange', ()=>{
+  if(!document.fullscreenElement) document.body.classList.remove('immersive');
+});
 
 // ── BOOT
 reset();
