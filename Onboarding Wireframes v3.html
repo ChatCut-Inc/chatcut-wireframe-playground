@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ChatCut — v3 · Creator + Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1a1a1a;--ink-s:#2b2b2b;--paper:#fafaf7;--warm:#f4f1ea;--faint:#cfcabd;--acc:oklch(58% 0.14 28);--acc2:oklch(58% 0.14 220);--acc3:oklch(62% 0.12 140);}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Kalam',cursive;}
+  body{padding:22px 28px 70px;}
+  header.doc{max-width:1480px;margin:0 auto 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;border-bottom:2px solid var(--ink);padding-bottom:10px;}
+  h1.doc{font-family:'Caveat',cursive;font-weight:700;font-size:40px;margin:0;line-height:1;}
+  .doc-sub{font-size:13px;color:var(--ink-s);margin-top:3px;}
+  .doc-m{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-s);text-align:right;line-height:1.5;}
+
+  .pre-row{max-width:1480px;margin:0 auto 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .pre{border:1.5px solid var(--ink);padding:12px 14px;background:var(--warm);position:relative;font-size:13.5px;line-height:1.4;}
+  .pre h3{font-family:'Caveat',cursive;font-size:21px;margin:0 0 5px;font-weight:600;}
+  .st{position:absolute;top:-9px;right:12px;background:var(--acc);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.08em;padding:2px 7px;text-transform:uppercase;transform:rotate(-2deg);}
+  .st.g{background:var(--acc3);} .st.b{background:var(--acc2);}
+  code{font-family:'IBM Plex Mono',monospace;font-size:12px;background:#fff;padding:1px 5px;border:1px solid var(--faint);}
+
+  .life{max-width:1480px;margin:0 auto 20px;padding:12px 14px;border:1.5px solid var(--ink);background:#fff;}
+  .life h3{font-family:'Caveat',cursive;font-size:21px;margin:0 0 5px;}
+  .stages{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .sc{border:1.2px solid var(--ink);padding:7px 9px;background:var(--warm);font-size:11px;line-height:1.25;}
+  .sc .n{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);letter-spacing:0.08em;display:block;}
+  .sc .t{font-family:'Caveat',cursive;font-size:16px;font-weight:600;display:block;margin:2px 0 3px;}
+  .sc .u{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--acc);border-top:1px dashed var(--ink);padding-top:3px;margin-top:3px;}
+
+  h2.hd{max-width:1480px;margin:22px auto 6px;font-family:'Caveat',cursive;font-size:26px;font-weight:700;}
+  .hd-sub{max-width:1480px;margin:0 auto 10px;font-size:13px;color:var(--ink-s);}
+  .strip{max-width:1480px;margin:0 auto;display:flex;gap:14px;overflow-x:auto;padding:4px 2px 16px;}
+  .fw{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;}
+  .fl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);letter-spacing:0.08em;text-transform:uppercase;}
+  .fl .st2{display:inline-block;border:1.2px solid var(--ink);padding:1px 5px;margin-right:5px;background:#fff;}
+  .fl .lc{display:inline-block;border:1.2px solid var(--acc2);padding:1px 5px;background:#fff;color:var(--acc2);margin-left:4px;}
+  .fr{border:2px solid var(--ink);background:#fff;position:relative;overflow:hidden;box-shadow:3px 3px 0 var(--ink);}
+  .fr.sm{width:580px;height:380px;}
+  .fr.md{width:760px;height:460px;}
+  .fr.lg{width:960px;height:540px;}
+  .ar{display:flex;align-items:center;align-self:center;padding:0 2px;}
+  .ar svg{width:38px;height:26px;}
+  .cap{font-size:12px;color:var(--ink-s);max-width:960px;line-height:1.35;}
+
+  .bb{position:absolute;top:0;left:0;right:0;height:22px;border-bottom:1.5px solid var(--ink);display:flex;align-items:center;padding:0 8px;gap:6px;background:var(--warm);}
+  .bb .d{width:8px;height:8px;border:1.2px solid var(--ink);border-radius:50%;background:#fff;}
+  .bb .u{flex:1;border:1.2px solid var(--ink);height:12px;margin:0 8px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;line-height:12px;padding:0 6px;color:var(--ink-s);}
+  .bb .av{width:12px;height:12px;border:1.2px solid var(--ink);border-radius:50%;background:#fff;}
+  .sa{position:absolute;top:22px;left:0;right:0;bottom:0;display:flex;flex-direction:column;}
+
+  .btn{display:inline-block;border:1.3px solid var(--ink);padding:3px 9px;font-size:12px;background:#fff;box-shadow:1.2px 1.2px 0 var(--ink);}
+  .btn.pr{background:var(--ink);color:#fff;box-shadow:1.2px 1.2px 0 var(--acc);}
+  .btn.ch{font-size:11px;padding:2px 7px;}
+  .btn.sm{font-size:10px;padding:1px 6px;box-shadow:1px 1px 0 var(--ink);}
+  .ph{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.08) 6px 7px),var(--warm);border:1.2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);text-align:center;padding:4px;}
+  .callout{position:absolute;font-family:'Caveat',cursive;font-size:13px;color:var(--acc);font-weight:600;line-height:1.15;z-index:3;}
+  .callout.g{color:var(--acc3);} .callout.b{color:var(--acc2);}
+
+  /* marketing */
+  .mkt-nav{display:flex;align-items:center;gap:12px;padding:7px 12px;border-bottom:1.2px solid var(--ink);font-size:12px;background:#fff;}
+  .mkt-nav .lg{font-family:'Caveat',cursive;font-size:19px;font-weight:700;}
+  .mkt-nav .sp{flex:1}
+  .mkt-nav .lnk{color:var(--ink-s);}
+  .mkt-h{padding:14px 18px;display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:center;}
+  .mkt-h h2{font-family:'Caveat',cursive;font-size:28px;line-height:1.05;margin:0 0 5px;}
+  .mkt-h p{font-size:12px;line-height:1.35;margin:0 0 8px;color:var(--ink-s);}
+  .mkt-h .hero-vis{border:1.2px solid var(--ink);background:#111;color:#eee;font-family:'IBM Plex Mono',monospace;font-size:10px;height:150px;display:flex;align-items:center;justify-content:center;position:relative;}
+  .mkt-feat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:2px 18px 10px;}
+  .mkt-feat .f{border:1.2px solid var(--ink);padding:6px 8px;font-size:11px;background:var(--warm);line-height:1.25;}
+  .mkt-feat .f b{font-family:'Caveat',cursive;font-size:13px;display:block;font-weight:600;}
+
+  /* signup */
+  .su{display:flex;align-items:center;justify-content:center;height:100%;background:var(--warm);}
+  .su .box{width:260px;border:1.5px solid var(--ink);background:#fff;padding:14px;box-shadow:3px 3px 0 var(--ink);}
+  .su .box h3{font-family:'Caveat',cursive;font-size:20px;margin:0 0 8px;font-weight:700;}
+  .su .opt{border:1.2px solid var(--ink);padding:6px 8px;margin-bottom:6px;font-size:11px;display:flex;align-items:center;gap:6px;background:#fff;}
+  .su .div{text-align:center;font-size:10px;color:var(--ink-s);margin:6px 0;}
+  .su .fld{border:1.2px solid var(--ink);padding:4px 7px;font-size:11px;color:var(--ink-s);margin-bottom:6px;}
+
+  /* app shell */
+  .top{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1.2px solid var(--ink);font-size:12px;background:#fff;}
+  .top .home{font-family:'Caveat',cursive;font-size:16px;font-weight:700;display:flex;align-items:center;gap:5px;}
+  .top .home .ic{width:14px;height:14px;border:1.5px solid var(--ink);border-radius:3px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:9px;}
+  .top .sp{flex:1;}
+  .top .crumb{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);}
+
+  /* home */
+  .hbody{flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0;}
+  .crt{border-right:1.5px solid var(--ink);padding:10px 12px;background:var(--paper);display:flex;flex-direction:column;gap:7px;overflow:hidden;}
+  .crt .ti{font-family:'Caveat',cursive;font-size:19px;font-weight:700;}
+  .crt .tabs{display:flex;border-bottom:1.2px solid var(--ink);flex-wrap:wrap;}
+  .crt .tabs div{font-size:10.5px;padding:3px 7px;border:1.2px solid var(--ink);border-bottom:none;margin-right:-1px;background:var(--warm);position:relative;top:1px;}
+  .crt .tabs div.on{background:#fff;border-bottom:1.2px solid #fff;font-weight:700;}
+  .crt .card{border:1.2px solid var(--ink);padding:8px 10px;background:#fff;display:flex;flex-direction:column;gap:5px;}
+  .crt .card h4{font-family:'Caveat',cursive;font-size:14.5px;margin:0;font-weight:600;}
+  .crt .fld{border:1.2px solid var(--ink);padding:3px 7px;font-size:11px;background:#fff;color:var(--ink-s);}
+  .crt .drop{border:1.2px dashed var(--ink);padding:8px;background:var(--warm);text-align:center;font-size:11px;color:var(--ink-s);}
+  .crt .chips{display:flex;gap:4px;flex-wrap:wrap;}
+  .crt .chip{border:1.2px solid var(--ink);padding:1px 6px;background:#fff;font-size:10px;}
+  .crt .chip.on{background:var(--ink);color:#fff;}
+  .crt .create{background:var(--acc);color:#fff;border:1.5px solid var(--ink);padding:4px 0;text-align:center;font-size:12px;font-weight:700;box-shadow:1.2px 1.2px 0 var(--ink);}
+  .crt .setup{border:1.2px solid var(--ink);padding:6px 8px;background:#fff;font-size:10.5px;color:var(--ink-s);line-height:1.3;}
+  .crt .fb{margin-top:auto;display:flex;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);}
+  .crt .fb span{border:1px solid var(--faint);padding:1px 5px;}
+
+  .gal{padding:10px 14px;background:var(--warm);overflow:hidden;display:flex;flex-direction:column;gap:6px;}
+  .gal .gh{display:flex;align-items:center;gap:10px;}
+  .gal .gh h3{font-family:'Caveat',cursive;font-size:19px;font-weight:700;margin:0;}
+  .gal .gh .sp{flex:1}
+  .gal .gh .src{border:1.2px solid var(--faint);padding:3px 8px;font-size:11px;color:var(--ink-s);background:#fff;width:140px;}
+  .gtabs{display:flex;border-bottom:1.5px solid var(--faint);}
+  .gtabs div{font-size:12px;padding:4px 12px;color:var(--ink-s);position:relative;}
+  .gtabs div.on{border:1.2px solid var(--ink);border-bottom:2px solid #fff;background:#fff;color:var(--ink);font-weight:700;bottom:-1.5px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .tile{border:1.2px solid var(--ink);background:#fff;display:flex;flex-direction:column;box-shadow:1.2px 1.2px 0 var(--ink);}
+  .tile .thumb{height:74px;border-bottom:1.2px solid var(--ink);position:relative;overflow:hidden;}
+  .tile .thumb.sm{height:60px}
+  .tile .thumb .d{position:absolute;bottom:2px;right:3px;background:rgba(0,0,0,.75);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:0 4px;letter-spacing:0.05em;}
+  .tile .body{padding:4px 7px;font-size:10px;line-height:1.2;}
+  .tile .body b{font-family:'Caveat',cursive;font-size:13px;font-weight:600;display:block;}
+  .tile .body .m{color:var(--ink-s);font-size:9px;}
+  .tile.empty{border-style:dashed;background:var(--paper);}
+  .tile.empty .thumb{background:var(--paper);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);}
+
+  /* project */
+  .pbody{flex:1;display:grid;grid-template-columns:320px 1fr;min-height:0;}
+  .chat{border-right:1.5px solid var(--ink);background:var(--paper);display:flex;flex-direction:column;}
+  .chat .scr{flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:5px;overflow:hidden;}
+  .bub{border:1.2px solid var(--ink);padding:4px 7px;font-size:11px;line-height:1.3;background:#fff;max-width:92%;}
+  .bub.ai{align-self:flex-start;background:var(--warm);}
+  .bub.me{align-self:flex-end;background:var(--ink);color:#fff;}
+  .bub .nm{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--ink-s);letter-spacing:0.06em;display:block;margin-bottom:2px;}
+  .bub.me .nm{color:var(--paper);opacity:.6;}
+  .comp{border-top:1.2px solid var(--ink);padding:5px 8px 7px;background:var(--warm);}
+  .comp .r{display:flex;gap:5px;align-items:center;}
+  .comp .f{flex:1;border:1.2px solid var(--ink);padding:3px 6px;font-size:10px;background:#fff;color:var(--ink-s);}
+  .art{padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--warm);overflow:hidden;}
+  .ac{border:1.2px solid var(--ink);background:#fff;padding:7px;box-shadow:2px 2px 0 var(--ink);}
+  .ac.acc{border-color:var(--acc);box-shadow:2px 2px 0 var(--acc);}
+  .ac .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+  .ac .h .t{font-family:'Caveat',cursive;font-size:14px;font-weight:600;}
+  .ac .h .m{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);}
+  .plyr{height:145px;background:#161616;color:#fff;position:relative;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;}
+  .plyr.big{height:200px;}
+  .plyr::after{content:"▶";position:absolute;font-size:30px;opacity:.7}
+  .tl{border:1.2px solid var(--ink);background:#fff;padding:5px 7px;}
+  .tl .h{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);margin-bottom:3px;}
+  .tlt{border:1.2px solid var(--ink);height:13px;background:var(--warm);display:flex;margin-bottom:2px;}
+  .tlc{border-right:1.2px solid var(--ink);flex:1;background:#fff;}
+  .tlc.sel{background:var(--acc);}
+  .tlc.dim{background:repeating-linear-gradient(45deg,#fff 0 3px,var(--warm) 3px 6px);}
+
+  /* variants */
+  .vr{max-width:1480px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 2px 22px;}
+  .vx{border:1.5px solid var(--ink);background:#fff;padding:10px 12px;}
+  .vx .l{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);letter-spacing:0.08em;}
+  .vx h4{font-family:'Caveat',cursive;font-size:19px;margin:0 0 2px;font-weight:700;}
+  .vx .m{background:var(--paper);border:1.2px solid var(--ink);padding:8px;margin-top:8px;}
+  .vx .pros{font-size:12px;line-height:1.4;margin-top:6px;}
+  .vx.rec{outline:3px solid var(--acc);outline-offset:-3px;}
+  .vx.rec .l{color:var(--acc);}
+  .tbs{display:flex;border-bottom:1.2px solid var(--ink);margin-bottom:5px;flex-wrap:wrap;}
+  .tbs span{font-size:10px;padding:2px 6px;border:1.2px solid var(--ink);border-bottom:none;margin-right:-1px;background:var(--warm);position:relative;top:1px;}
+  .tbs span.on{background:#fff;font-weight:700;border-bottom:1.2px solid #fff;}
+  .rfld{border:1.2px solid var(--ink);background:#fff;font-size:10px;color:var(--ink-s);padding:3px 6px;margin-top:3px;}
+  .rrow{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
+  .rrow .c{border:1.2px solid var(--ink);padding:1px 5px;background:#fff;font-size:10px;}
+
+  /* consequences */
+  .cons{max-width:1480px;margin:24px auto 0;padding:14px 16px;border:2px dashed var(--ink);background:#fff;}
+  .cons h3{font-family:'Caveat',cursive;font-size:22px;margin:0 0 6px;}
+  .cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .cc{border:1.2px solid var(--ink);padding:9px 11px;background:var(--paper);}
+  .cc h4{font-family:'Caveat',cursive;font-size:17px;margin:0 0 3px;font-weight:600;}
+  .cc ul{font-size:13px;line-height:1.4;margin:2px 0;padding-left:18px;}
+  .tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:1px 6px;border:1px solid var(--ink);margin-right:4px;letter-spacing:0.06em;}
+  .tag.r{background:var(--acc);color:#fff;border-color:var(--acc);}
+  .tag.b{background:var(--acc2);color:#fff;border-color:var(--acc2);}
+  .tag.g{background:var(--acc3);color:#fff;border-color:var(--acc3);}
+  .tag.k{background:var(--ink);color:#fff;}
+
+  /* thumb textures for tiles */
+  .th-warm{background:linear-gradient(135deg,#6b4a3a 0%,#3a2a1a 50%,#8a6a4a 100%);}
+  .th-blue{background:linear-gradient(135deg,#1a3a5a,#2a5a7a);}
+  .th-pink{background:linear-gradient(160deg,#8a3a5a,#d08aa0);}
+  .th-green{background:linear-gradient(135deg,#2a4a3a,#5a8a6a);}
+  .th-purple{background:linear-gradient(135deg,#3a2a5a,#6a5a8a);}
+  .th-red{background:linear-gradient(135deg,#5a2a2a,#9a4a4a);}
+  .th-black{background:linear-gradient(135deg,#1a1a1a,#3a3a3a);}
+  .th-yellow{background:linear-gradient(135deg,#8a7a2a,#d0c06a);}
+  .th-examples{background:repeating-linear-gradient(45deg,#f4f1ea 0 8px,#e8e4d8 8px 16px);}
+
+  #tw{position:fixed;bottom:20px;right:20px;width:220px;border:2px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink);padding:12px 14px;font-size:13px;z-index:50;display:none;}
+  #tw.on{display:block}
+  #tw h5{font-family:'Caveat',cursive;font-size:19px;margin:0 0 6px;font-weight:700;}
+  #tw label{display:flex;justify-content:space-between;gap:8px;margin:5px 0;}
+</style>
+</head>
+<body>
+
+<header class="doc">
+  <div>
+    <h1 class="doc">ChatCut — v3 · Creator + Gallery</h1>
+    <div class="doc-sub">Marketing site untouched → sign in → app home (creator panel + project gallery) → chat + artifact inside each project.</div>
+  </div>
+  <div class="doc-m">
+    <b>scope</b> post-auth app<br>
+    <b>shape</b> Claude Design home · chat-native project<br>
+    <b>ref</b> ChatCut-Inc/chatcut@beta
+  </div>
+</header>
+
+<section class="pre-row">
+  <div class="pre"><div class="st g">kept</div>
+    <h3>Marketing &amp; SEO untouched</h3>
+    <p>v3 only touches what's <b>behind</b> Sign-in. <code>chatcut.dev</code> — hero, features, pricing, blog — unchanged. "Start free" routes to <code>/signup</code> then into the new app home.</p>
+  </div>
+  <div class="pre"><div class="st b">home</div>
+    <h3>Creator + Gallery</h3>
+    <p>Left: <b>typed creator</b> with tabs (Edit / Generate / Template / Blank). Your 6 scenarios live inside as subtypes. Right: <b>project gallery</b> — real video thumbnails, Examples as a peer tab.</p>
+  </div>
+  <div class="pre"><div class="st">project</div>
+    <h3>Home button is the spine</h3>
+    <p>Inside <code>/p/:id</code>: no sidebar. Top-left Home icon returns to gallery. Chat-left / preview-right. Timeline as a drawer summoned on demand.</p>
+  </div>
+</section>
+
+<section class="life">
+  <h3>Lifecycle × surface</h3>
+  <div class="stages">
+    <div class="sc"><span class="n">S0</span><span class="t">Anon · discover</span>Marketing, SEO, pricing.<div class="u">chatcut.dev</div></div>
+    <div class="sc"><span class="n">S1</span><span class="t">Signup</span>OAuth + email code.<div class="u">/signup</div></div>
+    <div class="sc"><span class="n">S2</span><span class="t">First-minute</span>Empty gallery · creator ready.<div class="u">app /</div></div>
+    <div class="sc"><span class="n">S3</span><span class="t">First project</span>Chat + preview artifact.<div class="u">app /p/:id</div></div>
+    <div class="sc"><span class="n">S4</span><span class="t">Manual tweak</span>Timeline drawer up.<div class="u">same · L3</div></div>
+    <div class="sc"><span class="n">S5</span><span class="t">Returning</span>Home → thumbnail gallery.<div class="u">app /</div></div>
+    <div class="sc"><span class="n">S6</span><span class="t">Power-user</span>Timeline-dominant project.<div class="u">same · L4</div></div>
+  </div>
+</section>
+
+<h2 class="hd">Main flow — anon → signup → home → first project</h2>
+<div class="hd-sub">Walks a brand-new user from the marketing site all the way to their first exported cut. One continuous strip; no teleporting.</div>
+<div class="strip" id="main"></div>
+
+<h2 class="hd">Returning users — gallery density, agency / team</h2>
+<div class="hd-sub">Day 7. User has 8 projects. Gallery does the job a chat-history sidebar would do — better, because thumbnails.</div>
+<div class="strip" id="ret"></div>
+
+<h2 class="hd">Creator-panel variants (A / B / C)</h2>
+<div class="hd-sub">Three ways to structure the creator's tabs. B is my recommendation — 4 tabs matches Claude Design's density, teaches the product's three big verbs.</div>
+<div class="vr">
+  <div class="vx">
+    <div class="l">VARIANT A</div>
+    <h4>6 type tabs (matches sketches 1:1)</h4>
+    <div class="m">
+      <div class="tbs"><span class="on">Talking head</span><span>UGC</span><span>AI vid</span><span>MG</span><span>VO</span><span>Music</span></div>
+      <div style="font-size:11px;color:var(--ink-s);">Upload footage…</div>
+      <div class="rrow"><span class="c">Remove filler</span><span class="c">Tighten</span><span class="c">+ captions</span></div>
+      <div class="rfld">project name</div>
+    </div>
+    <div class="pros"><b>✓</b> 1:1 with your meeting sketches<br><b>✓</b> teaches range at a glance<br><b>✗</b> jargon (UGC, MG), tab overflow on mobile</div>
+  </div>
+  <div class="vx rec">
+    <div class="l">VARIANT B · RECOMMENDED</div>
+    <h4>3 verbs + template + blank</h4>
+    <div class="m">
+      <div class="tbs"><span class="on">Edit</span><span>Generate</span><span>From template</span><span>Blank</span></div>
+      <div style="font-size:11px;color:var(--ink-s);">What are you editing?</div>
+      <div class="rrow"><span class="c">Talking head</span><span class="c">Interview</span><span class="c">Podcast</span><span class="c">UGC</span></div>
+      <div class="rfld">project name</div>
+      <div style="font-size:11px;color:var(--ink-s);margin-top:3px;">drop footage…</div>
+    </div>
+    <div class="pros"><b>✓</b> 4 tabs — Claude Design density<br><b>✓</b> 3 big verbs teach the product<br><b>✓</b> subtype as chips disambiguates<br><b>—</b> one extra click vs A</div>
+  </div>
+  <div class="vx">
+    <div class="l">VARIANT C</div>
+    <h4>Single form, picker inside</h4>
+    <div class="m">
+      <div style="font-size:11px;color:var(--ink-s);">I want to…</div>
+      <div class="rfld">▾ edit a talking head</div>
+      <div class="rfld">project name</div>
+      <div style="font-size:11px;color:var(--ink-s);margin-top:3px;">drop footage, URL, or describe…</div>
+      <div class="rrow"><span class="c">Templates →</span></div>
+    </div>
+    <div class="pros"><b>✓</b> minimum chrome, fast<br><b>✓</b> no taxonomy lessons<br><b>✗</b> new users stare at a blank form<br><b>✗</b> templates demoted to a link</div>
+  </div>
+</div>
+
+<section class="cons">
+  <h3>Consequences — what changes, what survives</h3>
+  <div class="cg">
+    <div class="cc">
+      <h4><span class="tag g">keep</span>Marketing site untouched</h4>
+      <ul><li><code>chatcut.dev</code> — hero, features, testimonials, pricing, blog. Zero SEO impact.</li><li>"Start free" routes to <code>/signup</code> which lands in the new app home (not the old PromptCreator).</li><li>Feature demo clips become <b>Examples</b> tiles in the gallery — reused, not rebuilt.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag r">replace</span>Post-auth routes</h4>
+      <ul><li><code>/</code> (today's PromptCreator) → creator + gallery.</li><li><code>/projects</code> → merged into gallery via "Your projects" tab.</li><li><code>/editor/:id</code> → <code>/p/:id</code> · chat-left / artifact-right.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag b">absorb</span>Scenarios &amp; templates</h4>
+      <ul><li>6 scenario cards become sub-chips inside Edit / Generate tabs.</li><li><code>TemplateBrowser</code> modal dies → becomes the <b>From template</b> tab.</li><li>New <b>Examples</b> row in the gallery for runnable inspiration.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag k">nav</span>Home button is the spine</h4>
+      <ul><li>Top-left Home on every <code>/p/:id</code>. Click → gallery. No breadcrumbs.</li><li>Deep links to projects work from anywhere.</li><li>Shared-link collaborators see "Fork into my projects" where Home would be.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag r">kill</span>Chat-history sidebar (my v2 mistake)</h4>
+      <ul><li>Video projects are too heavy for a text-chat history metaphor.</li><li>Gallery tiles = history, thumbnail-first. Search + filter live there.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag b">data</span>Project is the unit</h4>
+      <ul><li>No schema change to <code>Project</code> in <code>@chatcut/zero</code>.</li><li>Add: <code>kind</code>, <code>pinned_artifact_id</code>, <code>thumbnail_url</code>, <code>last_accessed_at</code>.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag g">phase</span>Ship order</h4>
+      <ul><li><b>P1</b> new home behind a flag; create still redirects to old editor.</li><li><b>P2</b> rebuild editor as <code>/p/:id</code> chat+artifact shell.</li><li><b>P3</b> kill TemplateBrowser &amp; <code>/projects</code> page; migrate thumbs.</li><li><b>P4</b> Examples row + power-user layout memory.</li></ul>
+    </div>
+    <div class="cc">
+      <h4><span class="tag k">metrics</span>What this should move</h4>
+      <ul><li>Signup → first export: target ↓30%.</li><li>% new users clicking a creator tab (teaching signal).</li><li>Day-1 return gallery click-through (thumbnail recall).</li><li>Template-tab engagement (should jump when first-class).</li></ul>
+    </div>
+  </div>
+</section>
+
+<div id="tw">
+  <h5>Tweaks</h5>
+  <label>Callouts<input type="checkbox" id="tw-c" checked></label>
+  <label>Creator variant<select id="tw-v"><option value="b" selected>B · 4 tabs</option><option value="a">A · 6 tabs</option><option value="c">C · single</option></select></label>
+  <label>Paper<select id="tw-p"><option value="warm" selected>Warm</option><option value="cool">Cool</option><option value="bright">Bright</option></select></label>
+</div>
+
+<script>
+const arrow=()=>`<div class="ar"><svg viewBox="0 0 44 30" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15 C 12 10, 28 22, 40 15"/><path d="M33 8 L 40 15 L 33 22"/></svg></div>`;
+const bb=u=>`<div class="bb"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">${u}</span><span class="av"></span></div>`;
+const topBar=(cr)=>`<div class="top"><span class="home"><span class="ic">⌂</span>ChatCut</span><span class="sp"></span><span class="crumb">${cr||''}</span><span class="btn sm">⏻</span></div>`;
+
+// creator panel — variant B default
+function creator(opts={}){
+  const tab = opts.tab || 'edit';
+  const name = opts.name || '';
+  return `
+  <div class="crt">
+    <div class="ti">Start a project</div>
+    <div class="tabs">
+      <div class="${tab==='edit'?'on':''}">Edit</div>
+      <div class="${tab==='gen'?'on':''}">Generate</div>
+      <div class="${tab==='tpl'?'on':''}">From template</div>
+      <div class="${tab==='blank'?'on':''}">Blank</div>
+    </div>
+    ${tab==='edit'?`
+      <div class="card">
+        <h4>Edit footage</h4>
+        <div style="font-size:10.5px;color:var(--ink-s);">What are you editing?</div>
+        <div class="chips">
+          <span class="chip on">Talking head</span><span class="chip">Interview</span><span class="chip">Podcast</span><span class="chip">UGC</span><span class="chip">Reel</span>
+        </div>
+        <div class="fld">${name||'project name'}</div>
+        <div class="drop">⤓ drop mp4, mov, mp3 — or paste URL</div>
+        <div class="fld" style="min-height:28px;">describe the cut you want…</div>
+        <div class="create">Create project ⏎</div>
+      </div>`:''}
+    ${tab==='gen'?`
+      <div class="card">
+        <h4>Generate from prompt</h4>
+        <div class="chips">
+          <span class="chip on">AI video</span><span class="chip">Voiceover</span><span class="chip">Music</span><span class="chip">Motion graphic</span>
+        </div>
+        <div class="fld">${name||'project name'}</div>
+        <div class="fld" style="min-height:48px;">describe what you want generated…</div>
+        <div class="create">Create project ⏎</div>
+      </div>`:''}
+    ${tab==='tpl'?`
+      <div class="card">
+        <h4>Start from a template</h4>
+        <div class="fld" style="color:var(--ink-s);">⌕ search templates…</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:2px;">
+          <div style="border:1.2px solid var(--ink);height:32px;" class="th-pink"></div>
+          <div style="border:1.2px solid var(--ink);height:32px;" class="th-blue"></div>
+          <div style="border:1.2px solid var(--ink);height:32px;" class="th-green"></div>
+          <div style="border:1.2px solid var(--ink);height:32px;" class="th-purple"></div>
+        </div>
+        <div class="create">Use template</div>
+      </div>`:''}
+    ${tab==='blank'?`
+      <div class="card">
+        <h4>Just describe it</h4>
+        <div class="fld" style="color:var(--ink-s);">project name</div>
+        <div class="fld" style="min-height:70px;color:var(--ink-s);">e.g. "cut my 8-min interview to 60s and remove filler"</div>
+        <div class="create">Create project ⏎</div>
+      </div>`:''}
+    <div class="setup"><b style="font-family:'Caveat',cursive;font-size:13px;">＋ Set up a brand kit</b><br>logos · fonts · stingers — reused across projects.</div>
+    <div class="fb"><span>Docs</span><span>Team</span><span>kw@chatcut</span></div>
+  </div>`;
+}
+
+// gallery
+function gallery(state='empty'){
+  const tabs = `
+    <div class="gtabs">
+      <div class="${state==='empty'||state==='examples'?'on':''}">Examples</div>
+      <div class="${state==='justone'||state==='full'?'on':''}">Recent</div>
+      <div>Your projects</div>
+      <div>Brand kits</div>
+    </div>`;
+  if(state==='empty'){
+    return `<div class="gal">
+      <div class="gh"><h3>Projects</h3><span class="sp"></span><span class="src">⌕ search</span></div>
+      ${tabs}
+      <div style="font-size:11px;color:var(--ink-s);">Nothing of yours yet — try an example, or start fresh on the left.</div>
+      <div class="grid3" style="margin-top:4px;">
+        ${exampleTile('th-warm','Interview → 60s','talking-head · 1 click')}
+        ${exampleTile('th-blue','UGC from URL','auto product video')}
+        ${exampleTile('th-pink','Podcast highlights','2 min reel')}
+        ${exampleTile('th-green','Remove ums &amp; pauses','cleanup only')}
+        ${exampleTile('th-purple','AI vid from prompt','text → 5s motion')}
+        ${exampleTile('th-yellow','Lower-thirds pack','branded MG')}
+      </div>
+    </div>`;
+  }
+  if(state==='justone'){
+    return `<div class="gal">
+      <div class="gh"><h3>Projects</h3><span class="sp"></span><span class="src">⌕ search</span></div>
+      ${tabs}
+      <div style="font-size:11px;color:var(--ink-s);">Your first project is rendering…</div>
+      <div class="grid3" style="margin-top:4px;">
+        ${projectTile('th-warm','Q3 founder interview','rendering · just now',null,'0:58')}
+        ${exampleTile('th-blue','UGC from URL','example')}
+        ${exampleTile('th-pink','Podcast highlights','example')}
+      </div>
+    </div>`;
+  }
+  if(state==='full'){
+    return `<div class="gal">
+      <div class="gh"><h3>Projects</h3><span class="sp"></span><span class="src">⌕ Q3 inter…</span></div>
+      ${tabs}
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);margin-top:2px;">TODAY</div>
+      <div class="grid4">
+        ${projectTile('th-warm','Q3 founder interview','exported · 5:14pm','0:30')}
+        ${projectTile('th-blue','Brand promo v3','draft','0:15')}
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);margin-top:4px;">THIS WEEK</div>
+      <div class="grid4">
+        ${projectTile('th-pink','Podcast ep 14 highlights','exported','2:03')}
+        ${projectTile('th-green','Product demo V/O','exported','0:42')}
+        ${projectTile('th-purple','Launch motion graphic','draft','0:06')}
+        ${projectTile('th-red','UGC · sneakers','exported','0:20')}
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);margin-top:4px;">OLDER</div>
+      <div class="grid4">
+        ${projectTile('th-yellow','Intro stinger v2','exported','0:04')}
+        ${projectTile('th-black','AI vid test','archived','0:05')}
+      </div>
+    </div>`;
+  }
+}
+function projectTile(th,title,meta,dur){
+  return `<div class="tile">
+    <div class="thumb ${th}">${dur?`<span class="d">${dur}</span>`:''}</div>
+    <div class="body"><b>${title}</b><span class="m">${meta}</span></div>
+  </div>`;
+}
+function exampleTile(th,title,meta){
+  return `<div class="tile" style="opacity:.9;">
+    <div class="thumb ${th}"><span class="d">example</span></div>
+    <div class="body"><b>${title}</b><span class="m">${meta}</span></div>
+  </div>`;
+}
+
+// MAIN flow frames
+const mainFrames = [
+  // 1. marketing
+  {cls:'fr md', lbl:'Anon visitor', lc:'S0', cap:'Public marketing site. SEO intact. Nothing here changes.', body:`
+    ${bb('chatcut.dev')}
+    <div class="sa">
+      <div class="mkt-nav">
+        <span class="lg">ChatCut</span>
+        <span class="lnk">Product</span><span class="lnk">Templates</span><span class="lnk">Pricing</span><span class="lnk">Blog</span>
+        <span class="sp"></span>
+        <span class="btn sm">Sign in</span><span class="btn pr sm">Start free</span>
+      </div>
+      <div class="mkt-h">
+        <div>
+          <h2>Edit video by talking to it.</h2>
+          <p>Upload footage, tell ChatCut what to cut, and get a shareable reel in minutes. Talking heads, UGC, podcasts, motion graphics.</p>
+          <div style="display:flex;gap:6px;"><span class="btn pr">Start free →</span><span class="btn">Watch 90s demo</span></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);margin-top:8px;">used by 2,400+ creators · no card required</div>
+        </div>
+        <div class="hero-vis">preview reel · 0:30</div>
+      </div>
+      <div class="mkt-feat">
+        <div class="f"><b>Cut by conversation</b>Say "tighten the middle, remove ums." Done.</div>
+        <div class="f"><b>AI fillers &amp; highlights</b>Pulls your best moments automatically.</div>
+        <div class="f"><b>Templates &amp; brand kits</b>Podcast reels, UGC spots, motion packs.</div>
+      </div>
+    </div>
+    <div class="callout g" style="right:14px;top:40px;">this whole page<br/>stays the same</div>
+  `},
+  // 2. signup
+  {cls:'fr sm', lbl:'Sign up', lc:'S1', cap:'"Start free" drops into a minimal signup. Google, or email + 6-digit code. Same auth flow as today.', body:`
+    ${bb('chatcut.dev/signup')}
+    <div class="sa su">
+      <div class="box">
+        <h3>Sign in to ChatCut</h3>
+        <div class="opt">⌕ Continue with Google</div>
+        <div class="opt">⌯ Continue with Apple</div>
+        <div class="div">— or —</div>
+        <div class="fld">email@address</div>
+        <div class="btn pr" style="width:100%;text-align:center;">Email me a code</div>
+        <div style="font-size:9px;color:var(--ink-s);text-align:center;margin-top:8px;line-height:1.3;">by signing in you agree to the terms.<br/>no card needed — first 3 projects free.</div>
+      </div>
+    </div>
+    <div class="callout" style="left:18px;top:40px;">value-at-door<br/>only; no onboarding<br/>modal, no tour</div>
+  `},
+  // 3. empty home
+  {cls:'fr lg', lbl:'First-minute home', lc:'S2', cap:'Lands in the app. Left: creator already open, Edit tab selected. Right: gallery defaults to Examples because Recent is empty.', body:`
+    ${bb('app.chatcut.dev')}
+    <div class="sa">
+      ${topBar('')}
+      <div class="hbody">
+        ${creator({tab:'edit'})}
+        ${gallery('empty')}
+      </div>
+    </div>
+    <div class="callout b" style="left:340px;top:60px;">no hero, no tour.<br/>Examples tab<br/>carries the empty state</div>
+    <div class="callout" style="left:14px;top:200px;">1 click to start.<br/>no modals.</div>
+  `},
+  // 4. filling in
+  {cls:'fr lg', lbl:'Fill &amp; create', lc:'S2', cap:'User picks subtype, drops footage, names project, hits Create. No page change yet.', body:`
+    ${bb('app.chatcut.dev')}
+    <div class="sa">
+      ${topBar('')}
+      <div class="hbody">
+        <div class="crt">
+          <div class="ti">Start a project</div>
+          <div class="tabs"><div class="on">Edit</div><div>Generate</div><div>From template</div><div>Blank</div></div>
+          <div class="card">
+            <h4>Edit footage</h4>
+            <div style="font-size:10.5px;color:var(--ink-s);">What are you editing?</div>
+            <div class="chips"><span class="chip on">Talking head ✓</span><span class="chip">Interview</span><span class="chip">Podcast</span><span class="chip">UGC</span></div>
+            <div class="fld" style="color:var(--ink);">Q3 founder interview</div>
+            <div class="drop" style="color:var(--ink);background:#fff;">✓ interview-final.mp4 · 08:42</div>
+            <div class="fld" style="color:var(--ink);">cut to 60s, remove filler, keep top 3 moments</div>
+            <div class="create">Create project ⏎</div>
+          </div>
+          <div class="setup"><b style="font-family:'Caveat',cursive;font-size:13px;">＋ Set up a brand kit</b><br>logos · fonts · stingers.</div>
+          <div class="fb"><span>Docs</span><span>Team</span><span>kw@chatcut</span></div>
+        </div>
+        ${gallery('empty')}
+      </div>
+    </div>
+    <div class="callout" style="left:340px;top:240px;">gallery stays visible.<br/>you can browse while<br/>you fill the form</div>
+  `},
+  // 5. project — chat + artifact
+  {cls:'fr lg', lbl:'Inside project', lc:'S3', cap:'Create → /p/abc. Chat opens with AI restating the plan; artifact panel reserves space. Home button top-left.', body:`
+    ${bb('app.chatcut.dev/p/abc')}
+    <div class="sa">
+      ${topBar('Q3 founder interview · Edit footage')}
+      <div class="pbody">
+        <div class="chat">
+          <div class="scr">
+            <div class="bub me"><span class="nm">YOU</span>cut to 60s, remove filler, keep top 3 moments</div>
+            <div class="bub ai"><span class="nm">CHATCUT</span>Got it — here's the plan:
+              <ul style="margin:3px 0 0 14px;padding:0;font-size:10.5px;line-height:1.35;"><li>transcribe</li><li>remove fillers</li><li>tighten pauses &gt; 0.6s</li><li>pick top 3 · 60s target</li></ul>
+            </div>
+            <div class="bub ai"><span class="nm">CHATCUT</span>Running now…</div>
+          </div>
+          <div class="comp"><div class="r"><span class="btn ch">＋</span><div class="f">ask a change…</div><span class="btn pr ch">⏎</span></div></div>
+        </div>
+        <div class="art">
+          <div class="ac acc">
+            <div class="h"><span class="t">▶ cut v1 · building</span><span class="m">42%</span></div>
+            <div class="plyr big" style="height:180px;">preview · rendering</div>
+            <div style="display:flex;gap:5px;margin-top:5px;"><span class="btn ch">📝 transcript</span><span class="btn ch">▦ timeline</span><span class="btn ch" style="margin-left:auto;">⤓ Export</span></div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-s);">transcript &amp; timeline appear when needed — not now.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="left:14px;top:40px;">Home button ⌂<br/>top-left · always</div>
+    <div class="callout b" style="left:340px;top:40px;">no sidebar.<br/>just chat + artifact.</div>
+  `},
+  // 6. done + tweak → timeline
+  {cls:'fr lg', lbl:'Manual tweak → timeline', lc:'S4', cap:'User drags a clip or asks spatially → timeline drawer slides up inside the artifact panel. First time the editor chrome appears.', body:`
+    ${bb('app.chatcut.dev/p/abc')}
+    <div class="sa">
+      ${topBar('Q3 founder interview · cut v1')}
+      <div class="pbody">
+        <div class="chat">
+          <div class="scr">
+            <div class="bub ai"><span class="nm">CHATCUT</span>Done — cut v1, 0:58.</div>
+            <div class="bub me"><span class="nm">YOU</span>grab clip 3 &amp; move it earlier</div>
+            <div class="bub ai"><span class="nm">CHATCUT</span>Opening the timeline — drag or type.</div>
+          </div>
+          <div class="comp"><div class="r"><div class="f">move clip 3 to start…</div><span class="btn pr ch">⏎</span></div></div>
+        </div>
+        <div class="art">
+          <div class="ac">
+            <div class="h"><span class="t">▶ cut v1 · 0:58</span><span class="m">pinned</span></div>
+            <div class="plyr" style="height:110px;">preview</div>
+          </div>
+          <div class="tl">
+            <div class="h"><span>TIMELINE · cut v1</span><span>⌘E close</span></div>
+            <div class="tlt"><div class="tlc"></div><div class="tlc"></div><div class="tlc sel"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc dim"></div></div>
+            <div class="tlt"><div class="tlc"></div><div class="tlc sel"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="left:340px;top:200px;">timeline appears<br/>on-demand · not default</div>
+  `},
+  // 7. back home
+  {cls:'fr lg', lbl:'Back to home', lc:'S3→S5', cap:'Click the Home icon. Gallery now has the new project tile — real thumbnail, duration badge, metadata. Continuity preserved.', body:`
+    ${bb('app.chatcut.dev')}
+    <div class="sa">
+      ${topBar('')}
+      <div class="hbody">
+        ${creator({tab:'edit'})}
+        ${gallery('justone')}
+      </div>
+    </div>
+    <div class="callout g" style="left:340px;top:170px;">new tile · real<br/>preview thumbnail</div>
+  `},
+];
+
+// RETURNING frames
+const retFrames = [
+  {cls:'fr lg', lbl:'Day 7 · returning', lc:'S5', cap:'Gallery = history. Grouped by Today / This Week / Older. Search + thumbnails handle scale better than a chat sidebar.', body:`
+    ${bb('app.chatcut.dev')}
+    <div class="sa">
+      ${topBar('')}
+      <div class="hbody">
+        ${creator({tab:'edit'})}
+        ${gallery('full')}
+      </div>
+    </div>
+    <div class="callout b" style="left:340px;top:40px;">the gallery<br/>IS the history.<br/>no chat sidebar.</div>
+  `},
+  {cls:'fr lg', lbl:'Hover a tile', lc:'S5', cap:'Hover reveals summary + quick actions (Rename, Archive, Share, Duplicate). Click → back into that project, state rehydrated.', body:`
+    ${bb('app.chatcut.dev')}
+    <div class="sa">
+      ${topBar('')}
+      <div class="hbody">
+        ${creator({tab:'edit'})}
+        ${gallery('full')}
+      </div>
+    </div>
+    <div style="position:absolute;left:540px;top:170px;width:240px;border:1.5px solid var(--ink);background:#fff;padding:8px 10px;box-shadow:3px 3px 0 var(--ink);font-size:11px;z-index:4;">
+      <div style="font-family:'Caveat',cursive;font-size:16px;font-weight:600;">Q3 founder interview</div>
+      <div style="color:var(--ink-s);font-size:10px;">0:30 · Edit · 14 chat turns · exported 5:14pm</div>
+      <div style="display:flex;gap:4px;margin-top:5px;"><span class="btn sm">Rename</span><span class="btn sm">Archive</span><span class="btn sm">Share</span><span class="btn sm">⎘</span></div>
+    </div>
+    <div class="callout" style="right:14px;top:40px;">auto-summary from<br/>the chat inside</div>
+  `},
+  {cls:'fr lg', lbl:'Power-user (Level 4)', lc:'S6', cap:'Same data, different density. Layout memory: this user always opens the timeline — so on return, timeline dominates, chat shrinks to a side rail.', body:`
+    ${bb('app.chatcut.dev/p/xyz')}
+    <div class="sa">
+      ${topBar('Launch motion graphic · cut v3')}
+      <div style="flex:1;display:grid;grid-template-columns:1fr 240px;min-height:0;">
+        <div style="display:flex;flex-direction:column;min-width:0;">
+          <div style="padding:8px 12px;border-bottom:1.2px solid var(--ink);display:flex;gap:10px;align-items:center;">
+            <div class="plyr" style="width:200px;height:110px;">preview</div>
+            <div style="flex:1;">
+              <div style="font-family:'Caveat',cursive;font-size:14px;font-weight:600;">cut v3 · 0:30</div>
+              <div style="font-size:10px;color:var(--ink-s);">pinned · exported</div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><span class="btn sm">⤓</span><span class="btn sm">↗</span><span class="btn sm">v1/v2/v3</span></div>
+            </div>
+          </div>
+          <div class="tl" style="flex:1;border:none;">
+            <div class="h"><span>TIMELINE · cut v3</span><span>⌘\\ chat</span></div>
+            <div class="tlt"><div class="tlc"></div><div class="tlc sel"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc dim"></div></div>
+            <div class="tlt"><div class="tlc"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc sel"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc"></div></div>
+            <div class="tlt"><div class="tlc dim"></div><div class="tlc dim"></div><div class="tlc"></div><div class="tlc"></div><div class="tlc dim"></div></div>
+            <div class="tlt"><div class="tlc"></div><div class="tlc"></div><div class="tlc sel"></div><div class="tlc"></div><div class="tlc"></div></div>
+          </div>
+        </div>
+        <div style="border-left:1.2px solid var(--ink);background:var(--paper);padding:6px;font-size:10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-s);">CHAT · ⌘\\ expand</div>
+          <div class="bub ai" style="font-size:10px;padding:3px 5px;">Moved clip 3.</div>
+          <div class="bub me" style="font-size:10px;padding:3px 5px;">move clip 3</div>
+          <div class="bub ai" style="font-size:10px;padding:3px 5px;">Done. v3.</div>
+          <div style="border:1.2px solid var(--ink);padding:3px 5px;background:#fff;font-size:10px;margin-top:auto;">ask…</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout b" style="left:14px;top:40px;">same Home button<br/>· same shell · denser</div>
+  `},
+];
+
+function render(container, frames){
+  const el = document.getElementById(container);
+  frames.forEach((f,i)=>{
+    if(i>0) el.insertAdjacentHTML('beforeend', arrow());
+    const w = document.createElement('div');
+    w.className='fw';
+    w.innerHTML = `
+      <div class="fl"><span class="st2">step ${i+1}</span>${f.lbl} <span class="lc">${f.lc}</span></div>
+      <div class="${f.cls}">${f.body}</div>
+      <div class="cap">${f.cap}</div>`;
+    el.appendChild(w);
+  });
+}
+render('main', mainFrames);
+render('ret', retFrames);
+
+// tweaks
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "showCallouts": true,
+  "creatorVariant": "b",
+  "paperTone": "warm"
+}/*EDITMODE-END*/;
+const tw = {...TWEAK_DEFAULTS};
+function apply(){
+  document.querySelectorAll('.callout').forEach(e=>e.style.display=tw.showCallouts?'':'none');
+  const r=document.documentElement;
+  if(tw.paperTone==='cool'){r.style.setProperty('--paper','#f5f7fa');r.style.setProperty('--warm','#eaeef4');}
+  else if(tw.paperTone==='bright'){r.style.setProperty('--paper','#fff');r.style.setProperty('--warm','#f2f2f2');}
+  else{r.style.setProperty('--paper','#fafaf7');r.style.setProperty('--warm','#f4f1ea');}
+}
+const twEl=document.getElementById('tw');
+document.getElementById('tw-c').addEventListener('change',e=>{tw.showCallouts=e.target.checked;apply();push('showCallouts',e.target.checked);});
+document.getElementById('tw-v').addEventListener('change',e=>{tw.creatorVariant=e.target.value;push('creatorVariant',e.target.value);});
+document.getElementById('tw-p').addEventListener('change',e=>{tw.paperTone=e.target.value;apply();push('paperTone',e.target.value);});
+function push(k,v){try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{[k]:v}},'*');}catch(e){}}
+window.addEventListener('message',ev=>{
+  const d=ev.data||{};
+  if(d.type==='__activate_edit_mode')twEl.classList.add('on');
+  else if(d.type==='__deactivate_edit_mode')twEl.classList.remove('on');
+});
+try{window.parent.postMessage({type:'__edit_mode_available'},'*');}catch(e){}
+apply();
+</script>
+</body>
+</html>

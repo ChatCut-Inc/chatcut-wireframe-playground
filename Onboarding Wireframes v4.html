@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ChatCut — v4 · The creator IS the onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1a1a;--paper:#fafaf7;--warm:#f4f1ea;--faint:#cfcabd;
+    --acc:oklch(58% 0.14 28);--acc2:oklch(58% 0.14 220);--acc3:oklch(62% 0.12 140);--acc4:oklch(70% 0.15 65);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Kalam',cursive;}
+  body{padding:22px 26px 70px;}
+  .wrap{max-width:1520px;margin:0 auto;}
+  header.doc{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:16px;}
+  h1.doc{font-family:'Caveat',cursive;font-weight:700;font-size:38px;margin:0;line-height:1;}
+  .sub{font-family:'Kalam',cursive;font-size:13.5px;color:#555;margin-top:3px;max-width:840px;line-height:1.35;}
+  .meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;text-align:right;line-height:1.5;}
+
+  /* strategic thesis block */
+  .thesis{border:2px solid var(--ink);background:#fff;padding:14px 18px;margin-bottom:18px;box-shadow:4px 4px 0 var(--ink);}
+  .thesis h2{font-family:'Caveat',cursive;font-size:28px;margin:0 0 4px;font-weight:700;line-height:1;}
+  .thesis .kicker{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase;}
+  .th-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;margin-top:10px;}
+  .th-col h4{font-family:'Caveat',cursive;font-size:18px;margin:0 0 4px;font-weight:700;}
+  .th-col p, .th-col li{font-size:13px;line-height:1.4;margin:3px 0;}
+  .th-col ul{padding-left:16px;margin:3px 0;}
+  .th-col code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--warm);padding:1px 4px;border:1px solid var(--faint);}
+  .th-col.keep{border-left:3px solid var(--acc3);padding-left:10px;}
+  .th-col.kill{border-left:3px solid var(--acc);padding-left:10px;}
+  .th-col.new{border-left:3px solid var(--acc2);padding-left:10px;}
+
+  /* question mapping */
+  .qmap{padding:11px 14px;border:1.5px solid var(--ink);background:#fff;margin-bottom:20px;}
+  .qmap h3{font-family:'Caveat',cursive;font-size:22px;margin:0 0 8px;}
+  .qmap table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .qmap th{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;letter-spacing:.08em;text-align:left;padding:4px 8px;border-bottom:1.5px solid var(--ink);text-transform:uppercase;}
+  .qmap td{padding:6px 8px;border-bottom:1px dashed var(--faint);vertical-align:top;line-height:1.35;}
+  .qmap td:first-child{font-family:'Caveat',cursive;font-size:14px;font-weight:600;width:180px;}
+  .qmap td code{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--warm);padding:1px 4px;border:1px solid var(--faint);}
+  .qmap .tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 5px;border:1px solid var(--ink);margin-right:3px;letter-spacing:.05em;}
+  .qmap .tag.new{background:var(--acc2);color:#fff;border-color:var(--acc2);}
+  .qmap .tag.exists{background:var(--acc3);color:#fff;border-color:var(--acc3);}
+  .qmap .tag.copy{background:var(--acc4);border-color:var(--acc4);}
+
+  /* shared from v3 */
+  h2.hd{font-family:'Caveat',cursive;font-size:28px;font-weight:700;margin:22px 0 4px;}
+  .hdsub{font-size:13px;color:#555;margin-bottom:10px;max-width:900px;line-height:1.35;}
+  .strip{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 18px;}
+  .fw{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;}
+  .fl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;}
+  .fl .x{display:inline-block;border:1.2px solid var(--ink);padding:1px 5px;margin-right:5px;background:#fff;}
+  .fl .y{display:inline-block;border:1.2px solid var(--acc2);padding:1px 5px;background:#fff;color:var(--acc2);margin-left:4px;}
+  .fl .z{display:inline-block;border:1.2px solid var(--acc);padding:1px 5px;background:#fff;color:var(--acc);margin-left:4px;}
+  .fr{border:2px solid var(--ink);background:#fff;position:relative;overflow:hidden;box-shadow:3px 3px 0 var(--ink);}
+  .fr.s{width:520px;height:340px;}
+  .fr.m{width:700px;height:440px;}
+  .fr.l{width:860px;height:520px;}
+  .fr.xl{width:980px;height:560px;}
+  .ar{display:flex;align-items:center;align-self:center;padding:0 2px;}
+  .ar svg{width:38px;height:26px;}
+  .cap{font-family:'Kalam',cursive;font-size:12px;color:#555;max-width:860px;line-height:1.35;}
+
+  .bb{position:absolute;top:0;left:0;right:0;height:22px;border-bottom:1.5px solid var(--ink);display:flex;align-items:center;padding:0 8px;gap:5px;background:var(--warm);z-index:2;}
+  .bb .d{width:8px;height:8px;border:1.2px solid var(--ink);border-radius:50%;background:#fff;}
+  .bb .u{flex:1;border:1.2px solid var(--ink);height:12px;margin:0 6px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;line-height:12px;padding:0 5px;color:#555;}
+  .bb .av{width:12px;height:12px;border:1.2px solid var(--ink);border-radius:50%;background:#fff;}
+  .sa{position:absolute;top:22px;left:0;right:0;bottom:0;display:flex;flex-direction:column;}
+
+  .btn{display:inline-block;border:1.2px solid var(--ink);padding:2px 7px;font-family:'Kalam',cursive;font-size:11px;background:#fff;box-shadow:1.5px 1.5px 0 var(--ink);line-height:1.15;}
+  .btn.p{background:var(--ink);color:#fff;box-shadow:1.5px 1.5px 0 var(--acc);}
+  .btn.sm{font-size:10px;padding:1px 6px;box-shadow:1px 1px 0 var(--ink);}
+  .btn.xs{font-size:9px;padding:1px 4px;box-shadow:1px 1px 0 var(--ink);}
+  .ph{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.08) 6px 7px),var(--warm);border:1.2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#555;text-align:center;padding:3px;}
+  .callout{position:absolute;font-family:'Caveat',cursive;font-size:13px;color:var(--acc);font-weight:600;line-height:1.15;z-index:3;max-width:200px;}
+  .callout.g{color:var(--acc3);}.callout.b{color:var(--acc2);}.callout.y{color:var(--acc4);}
+  .callout::before{content:"↳ ";}
+
+  /* top app chrome */
+  .top{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1.2px solid var(--ink);font-size:11px;background:#fff;}
+  .home-btn{font-family:'Caveat',cursive;font-size:16px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:default;}
+  .home-btn .ic{width:14px;height:14px;border:1.5px solid var(--ink);border-radius:3px;background:var(--warm);display:grid;place-items:center;font-size:8px;}
+  .top .sp{flex:1;}
+  .top .crumb{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#555;}
+
+  /* home body */
+  .h-body{flex:1;display:grid;grid-template-columns:360px 1fr;min-height:0;}
+  .crt{border-right:1.5px solid var(--ink);padding:10px 12px;background:var(--paper);display:flex;flex-direction:column;gap:7px;overflow:hidden;min-width:0;}
+  .crt .ti{font-family:'Caveat',cursive;font-size:19px;font-weight:700;line-height:1;}
+  .crt .ti small{font-family:'Kalam',cursive;font-size:11px;color:#555;font-weight:400;}
+  .persona{display:flex;gap:4px;align-items:center;font-size:10px;color:#555;}
+  .persona .c{border:1.2px solid var(--ink);padding:1px 5px;font-size:10px;background:#fff;font-family:'Kalam',cursive;}
+  .persona .c.on{background:var(--ink);color:#fff;}
+  /* intent grid — the 6 cards from keynote */
+  .intents{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+  .intent{border:1.2px solid var(--ink);background:#fff;padding:5px 7px;display:flex;flex-direction:column;gap:1px;position:relative;cursor:default;}
+  .intent:hover{background:var(--warm);}
+  .intent.on{background:var(--warm);outline:2px solid var(--acc);outline-offset:-1px;}
+  .intent .t{font-family:'Caveat',cursive;font-size:13px;font-weight:600;line-height:1.1;}
+  .intent .d{font-size:9.5px;color:#555;line-height:1.2;}
+  .intent .pro{position:absolute;top:2px;right:2px;background:var(--acc);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:7px;padding:0 3px;letter-spacing:.04em;}
+  .back{font-family:'Kalam',cursive;font-size:10px;color:#555;cursor:default;}
+  .fld{border:1.2px solid var(--ink);padding:3px 7px;font-size:11px;background:#fff;color:#555;}
+  .drop{border:1.2px dashed var(--ink);padding:10px;text-align:center;background:var(--warm);font-size:10.5px;color:#555;}
+  .lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#555;letter-spacing:.06em;text-transform:uppercase;margin-top:2px;}
+  .chips{display:flex;gap:4px;flex-wrap:wrap;}
+  .chips .c{border:1.2px solid var(--ink);padding:1px 6px;font-size:10px;background:#fff;font-family:'Kalam',cursive;}
+  .chips .c.on{background:var(--ink);color:#fff;}
+  .presets{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;}
+  .preset{border:1.2px solid var(--ink);background:#fff;aspect-ratio:1.3/1;display:flex;align-items:flex-end;padding:2px 3px;font-family:'Caveat',cursive;font-size:9px;position:relative;overflow:hidden;}
+  .preset.on{outline:2px solid var(--acc);outline-offset:-1px;}
+  .preset .b{background:rgba(0,0,0,.55);color:#fff;padding:0 2px;font-family:'IBM Plex Mono',monospace;font-size:7px;}
+  .skip{font-family:'Kalam',cursive;font-size:10px;text-decoration:underline;color:#555;text-align:center;cursor:default;}
+
+  /* gallery */
+  .gal{padding:10px 14px;background:var(--warm);overflow:hidden;display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .gal .gtop{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .gtabs{display:flex;border-bottom:1.2px solid var(--ink);flex:1;}
+  .gtabs div{font-size:12px;padding:4px 10px;border:1.2px solid transparent;border-bottom:1.5px solid var(--faint);color:#555;line-height:1.1;}
+  .gtabs div.on{border:1.5px solid var(--ink);border-bottom:2px solid var(--warm);color:var(--ink);background:var(--warm);position:relative;bottom:-1.5px;font-weight:700;}
+  .search{border:1.2px solid var(--faint);padding:3px 8px;font-size:10px;color:#555;background:#fff;width:130px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .tile{border:1.2px solid var(--ink);background:#fff;display:flex;flex-direction:column;box-shadow:1.5px 1.5px 0 var(--ink);}
+  .tile .thumb{height:70px;border-bottom:1.2px solid var(--ink);position:relative;display:flex;align-items:center;justify-content:center;}
+  .tile .thumb .dur{position:absolute;bottom:2px;right:3px;background:rgba(0,0,0,.7);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:0 4px;}
+  .tile .thumb .kind{position:absolute;top:2px;left:3px;background:#fff;color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:0 3px;border:1px solid var(--ink);letter-spacing:.04em;}
+  .tile .thumb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;color:rgba(255,255,255,.9);text-shadow:1px 1px 0 rgba(0,0,0,.6);}
+  .tile .body{padding:4px 7px;font-size:10px;line-height:1.2;}
+  .tile .body b{font-family:'Caveat',cursive;font-size:13px;font-weight:600;display:block;}
+  .tile .body .m{color:#555;font-size:9px;}
+  .tile.em{border-style:dashed;background:transparent;box-shadow:none;}
+  .tile.em .thumb{background:transparent;}
+  .th-head{background:linear-gradient(135deg,#5a4a3a,#9a7a5a);}
+  .th-ugc{background:linear-gradient(160deg,#1a3a5a,#4a6aa0);}
+  .th-ai{background:linear-gradient(160deg,#3a2a5a,#7a5aa0);}
+  .th-mg{background:linear-gradient(135deg,#3a5a2a,#6a9a5a);}
+  .th-vo{background:linear-gradient(135deg,#5a3a3a,#9a6a6a);}
+  .th-pod{background:linear-gradient(135deg,#2a3a4a,#5a6a8a);}
+  .th-mus{background:linear-gradient(135deg,#4a3a5a,#8a6aaa);}
+  .th-int{background:linear-gradient(135deg,#4a2a3a,#8a5a6a);}
+  .th-prm{background:linear-gradient(135deg,#3a4a3a,#7a8a6a);}
+
+  /* project body */
+  .p-body{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0;}
+  .chat{border-right:1.5px solid var(--ink);background:var(--paper);display:flex;flex-direction:column;min-width:0;}
+  .chat .msgs{flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:5px;overflow:hidden;}
+  .bub{border:1.2px solid var(--ink);padding:4px 7px;font-size:11px;line-height:1.3;background:#fff;max-width:94%;}
+  .bub.ai{align-self:flex-start;background:var(--warm);}
+  .bub.me{align-self:flex-end;background:var(--ink);color:#fff;}
+  .bub .nm{font-family:'IBM Plex Mono',monospace;font-size:8px;color:#666;letter-spacing:.06em;display:block;margin-bottom:2px;}
+  .bub.me .nm{color:#fff;opacity:.6;}
+  .bub .prompt{font-family:'IBM Plex Mono',monospace;font-size:10px;background:#fff;border:1px solid var(--faint);padding:3px 5px;margin-top:3px;line-height:1.3;color:#333;}
+  .comp{border-top:1.2px solid var(--ink);padding:5px 8px 7px;background:var(--warm);}
+  .comp .cc{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;}
+  .comp .cc .c{border:1.2px solid var(--ink);padding:1px 5px;font-size:9px;background:#fff;}
+  .comp .r{display:flex;gap:5px;align-items:center;}
+  .comp .f{flex:1;border:1.2px solid var(--ink);padding:3px 6px;font-size:10px;background:#fff;color:#555;}
+  .art{padding:10px 12px;display:flex;flex-direction:column;gap:7px;background:var(--warm);overflow:hidden;}
+  .ac{border:1.2px solid var(--ink);background:#fff;padding:6px;box-shadow:2px 2px 0 var(--ink);}
+  .ac.acc{border-color:var(--acc);box-shadow:2px 2px 0 var(--acc);}
+  .ac.blue{border-color:var(--acc2);box-shadow:2px 2px 0 var(--acc2);}
+  .ac .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+  .ac .h .t{font-family:'Caveat',cursive;font-size:13px;font-weight:600;}
+  .ac .h .m{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#555;}
+  .plyr{height:130px;background:#1a1a1a;color:#fff;position:relative;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;}
+  .plyr .ctrl{position:absolute;bottom:0;left:0;right:0;height:12px;background:#111;border-top:1px solid #333;display:flex;align-items:center;gap:5px;padding:0 5px;font-size:8px;color:#aaa;}
+
+  /* alternatives */
+  .vr{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 2px 16px;}
+  .vx{border:1.5px solid var(--ink);background:#fff;padding:11px 13px;}
+  .vx .l{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;letter-spacing:.08em;}
+  .vx h4{font-family:'Caveat',cursive;font-size:19px;margin:0 0 3px;font-weight:700;}
+  .vx .mk{background:var(--paper);border:1.2px solid var(--ink);padding:8px;margin-top:7px;}
+  .vx .pros{font-size:12.5px;line-height:1.4;margin-top:6px;}
+  .vx.rec{outline:3px solid var(--acc);outline-offset:-3px;}
+  .vx.rec .l{color:var(--acc);}
+  .vx.killed{opacity:.65;border-style:dashed;position:relative;}
+  .vx.killed::after{content:"";position:absolute;top:8%;left:5%;right:5%;bottom:8%;border-top:2px solid var(--acc);transform:rotate(-6deg);transform-origin:left;}
+  .vx.killed h4{text-decoration:line-through;}
+
+  /* kills section */
+  .kills{margin-top:22px;padding:13px 15px;border:2px dashed var(--ink);background:#fff;}
+  .kills h3{font-family:'Caveat',cursive;font-size:24px;margin:0 0 8px;}
+  .cg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .cc{border:1.2px solid var(--ink);padding:9px 11px;background:var(--paper);}
+  .cc h4{font-family:'Caveat',cursive;font-size:17px;margin:0 0 4px;font-weight:600;}
+  .cc ul,.cc p{font-size:12.5px;line-height:1.4;margin:2px 0;}
+  .cc ul{padding-left:18px;}
+  .tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:1px 6px;border:1px solid var(--ink);margin-right:4px;letter-spacing:.06em;}
+  .tag.r{background:var(--acc);color:#fff;border-color:var(--acc);}
+  .tag.b{background:var(--acc2);color:#fff;border-color:var(--acc2);}
+  .tag.g{background:var(--acc3);color:#fff;border-color:var(--acc3);}
+  .tag.k{background:var(--ink);color:#fff;}
+
+  #tw{position:fixed;bottom:20px;right:20px;width:220px;border:2px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink);padding:12px 14px;font-size:13px;z-index:50;display:none;}
+  #tw.on{display:block;}
+  #tw h5{font-family:'Caveat',cursive;font-size:20px;margin:0 0 6px;font-weight:700;}
+  #tw label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:5px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <div>
+    <h1 class="doc">ChatCut — v4 · The creator IS the onboarding</h1>
+    <div class="sub">I re-read your keynote + the current <code>PromptCreator</code>, <code>ScenarioCardGrid</code>, <code>TemplateBrowser</code>, and <code>ScenarioPresetCards</code>. The onboarding you sketched is <b>already 80% built</b> — it's the creator panel. v4 absorbs the keynote into that surface instead of spinning up a disposable onboarding flow.</div>
+  </div>
+  <div class="meta">
+    <b>decision</b> no separate onboarding route<br>
+    <b>principle</b> one surface, enriched on first run<br>
+    <b>sidebar</b> killed — see below
+  </div>
+</header>
+
+<!-- ── STRATEGIC THESIS ─────────────────────────────────────────── -->
+<section class="thesis">
+  <div class="kicker">strategic decision · v4</div>
+  <h2>The creator panel IS the onboarding. Three beats layered on top of it — nothing more.</h2>
+  <div class="th-grid">
+    <div class="th-col keep">
+      <h4>What ALREADY exists in code (re-use, don't rebuild)</h4>
+      <ul>
+        <li><code>ScenarioCardGrid</code> — your 6 "What do you want to do?" cards from keynote slide 3. <b>Same thing.</b></li>
+        <li><code>ScenarioPresetCards</code> — templates-within-templates. A scenario (e.g. <code>video-gen</code>) has preset sub-cards (styles). Matches "here are templates, reference or make your own."</li>
+        <li><code>TemplateBrowser</code> — motion-graphics gallery, hover-to-play.</li>
+        <li><code>PRO_SCENARIO_FEATURE_KEYS</code> — paid-gate already wired for Seedance 2.0. Keynote's "Seedance 2.0 is a premium model" → already implemented.</li>
+        <li><code>handleCreateBlankProject</code> — "Skip intro" already exists.</li>
+      </ul>
+    </div>
+    <div class="th-col new">
+      <h4>What's genuinely new (first-run additions)</h4>
+      <ul>
+        <li><b>Persona pill</b> — one-tap, dismissible: <i>Creator / Agency / Podcast / Editor</i>. Keynote slide 2. Answered once, personalizes scenario order + example gallery. <b>Not a gate.</b></li>
+        <li><b>Branch copy</b> — the supportive AI voice from keynote slides 4–8 ("Great! Upload your footage here…", "Amazing! Send me your link…") becomes the sub-head of each scenario's creator body.</li>
+        <li><b>The prompt-reveal moment</b> — keynote slide 9. Messy input → structured prompt card. <b>This isn't onboarding</b>; it's the standard first-turn behavior for every user, forever.</li>
+      </ul>
+    </div>
+    <div class="th-col kill">
+      <h4>What gets killed — be brutal</h4>
+      <ul>
+        <li><b>Separate onboarding route.</b> No <code>/welcome</code>. No wizard. Users don't need a tour before the product — the product IS the tour.</li>
+        <li><b>Left sidebar.</b> v2 chat-history, v3 re-consideration — both dead. The creator panel owns the left edge; inside projects, no sidebar. Agencies get <b>All Projects</b> as a dedicated page via Home menu, not chronic chrome.</li>
+        <li><b>Identity gate.</b> Keynote shows persona as a blocking step-2 — that's wrong. Making it dismissible means returning users, deep-link arrivals, and power users pay zero cost.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUESTION MAPPING ─────────────────────────────────────────── -->
+<section class="qmap">
+  <h3>Keynote slide → where it lives now</h3>
+  <table>
+    <thead><tr><th>Keynote beat</th><th>Where it lives in v4</th><th>Status</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Slide 1 · blank "1"</td><td>Nothing. No loading screen. Signup → creator.</td><td><span class="tag exists">skip</span></td><td>Loading screens between auth and value = drop-off.</td></tr>
+      <tr><td>Slide 2 · "Tell us about yourself" (Creator / Agency / Podcast)</td><td><b>Persona pill</b>, top of creator. Dismissible. First-run only auto-prompts; after that it's a stored setting you can change in account.</td><td><span class="tag new">new</span></td><td>One tap, no modal. Answer personalizes scenario order (<i>Podcast</i> → podcast editing first) and example gallery (<i>Agency</i> → UGC + client examples).</td></tr>
+      <tr><td>Slide 3 · "What do you want to do?" (6 intents)</td><td><b>Scenario grid</b> in creator. Already lives as <code>ScenarioCardGrid</code>. v4 adds <i>Generate VO</i> and <i>Generate music</i> to complete the keynote's 6.</td><td><span class="tag exists">exists</span> + 2 new</td><td>Missing scenarios: <code>voiceover</code>, <code>music-gen</code>. Add to <code>scenarios.ts</code>.</td></tr>
+      <tr><td>Slide 3 · "Skip intro"</td><td>Quiet link under the 6 cards → blank project. Already wired (<code>handleCreateBlankProject</code>).</td><td><span class="tag exists">exists</span></td><td>Just surface it. Today it's a button below templates; move it under scenarios instead.</td></tr>
+      <tr><td>Slide 4 · Talking head → upload + requirements</td><td>Scenario body: drop zone + requirement chips (remove fillers, tighten pauses, captions, vertical crop).</td><td><span class="tag copy">copy</span></td><td>Requirement chips = the existing preset sub-cards, rebranded as checkboxes when presets aren't visual.</td></tr>
+      <tr><td>Slide 5 · Motion graphics → templates</td><td>Scenario body: hover-to-play template grid. Already <code>TemplateBrowser</code>.</td><td><span class="tag exists">exists</span></td><td>Keep it. Maybe add "or describe your own" footer as a softer off-ramp.</td></tr>
+      <tr><td>Slide 6 · UGC → "Send me your link or product images"</td><td>Scenario body: URL field + image drop. Already wired (<code>url-to-ads</code>).</td><td><span class="tag exists">exists</span></td><td>Copy swap only — "Send me your link or product images and info."</td></tr>
+      <tr><td>Slide 7 · AI video → "Seedance 2.0 is premium"</td><td>PRO badge on scenario + preset cards. Upgrade dialog on select. Already <code>PricingDialog</code>.</td><td><span class="tag exists">exists</span></td><td>Keep the "Try other stuff" escape — route back to scenario grid.</td></tr>
+      <tr><td>Slide 8 · AI video (free path) → SOTA, tell us your idea</td><td>Scenario body: big prompt field with placeholder "Describe the shot, style, mood…"</td><td><span class="tag copy">copy</span></td><td>Free models (Kling standard, Veo 2) as default; Seedance as paid toggle.</td></tr>
+      <tr><td>Slide 9 · "AI turns it into a prompt"</td><td><b>Prompt-reveal card</b> — first artifact in every new chat. Messy user input → structured prompt → user edits inline → run.</td><td><span class="tag new">new</span></td><td>This is the <b>aha moment</b>. Not gated to first-run. Every new project does this on turn 1.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<h2 class="hd">The creator panel · before &amp; after first run</h2>
+<div class="hdsub">Four views of the SAME surface: empty/grid → picked scenario → prompt-reveal (aha) → second intent (mid-session). The persona pill is the only chrome that appears on first run and never again.</div>
+<div class="strip" id="creator"></div>
+
+<h2 class="hd">Multi-intent reality — the user is right, people do 2–3 things a session</h2>
+<div class="hdsub">The creator isn't a one-shot onboarding; it's the permanent home. Two paths for starting a second intent: from the project (pinned "New project" affordance in the top nav) or from Home (the creator is always there).</div>
+<div class="strip" id="multi"></div>
+
+<h2 class="hd">Edge paths — deep-link, returning, skip-intro, shared-link</h2>
+<div class="hdsub">The creator absorbs every entry point. Returning users skip persona (answered). Deep links bypass creator entirely. Shared-link visitors see a forkable project, never the creator.</div>
+<div class="strip" id="edge"></div>
+
+<!-- ── alternative persona placements we considered -->
+<h2 class="hd">Persona placement — three considered, one picked</h2>
+<div class="vr">
+  <div class="vx killed">
+    <div class="l">REJECTED · A</div>
+    <h4>Full-screen step-2 modal (keynote-literal)</h4>
+    <div class="mk">
+      <div style="text-align:center;padding:20px 5px;">
+        <div style="font-family:'Caveat',cursive;font-size:16px;margin-bottom:8px;">Tell us a little about yourself</div>
+        <div class="chips" style="justify-content:center;"><span class="c">Content Creator</span><span class="c">Agency</span><span class="c">Podcast</span></div>
+      </div>
+    </div>
+    <div class="pros"><b>✗</b> Blocks value. Adds a click nobody asked for.<br><b>✗</b> Returning users via reset password re-hit it. Deep-link arrivals confused.<br><b>✗</b> The aha moment is now 2 screens away instead of 1.</div>
+  </div>
+  <div class="vx rec">
+    <div class="l">CHOSEN · B</div>
+    <h4>Dismissible pill inside the creator</h4>
+    <div class="mk">
+      <div style="background:var(--warm);border:1.2px solid var(--ink);padding:5px 7px;border-radius:3px;">
+        <div style="font-size:10px;color:#555;font-family:'Kalam',cursive;">Quick thing — what brings you here? <span style="font-size:9px;opacity:.6;">(optional, ×)</span></div>
+        <div class="chips" style="margin-top:3px;"><span class="c on">Creator</span><span class="c">Agency</span><span class="c">Podcast</span><span class="c">Editor</span></div>
+      </div>
+      <div style="font-size:10px;color:#555;margin-top:5px;">↓ rest of creator continues — scenarios are already visible below</div>
+    </div>
+    <div class="pros"><b>✓</b> Non-blocking. Can skip or answer in 1 tap.<br><b>✓</b> Personalizes scenario order + example gallery.<br><b>✓</b> Returning users never see it. Deep-link bypasses.<br><b>✓</b> Shows creator immediately — aha is still one click away.</div>
+  </div>
+  <div class="vx">
+    <div class="l">ALT · C</div>
+    <h4>Inferred — no question at all</h4>
+    <div class="mk">
+      <div style="font-size:11px;color:#555;line-height:1.4;">No persona UI. Infer from first scenario click + prompt content. "Podcast ep 14" in title → tag user as podcaster. Store silently.</div>
+    </div>
+    <div class="pros"><b>✓</b> Lowest-friction — no UI at all.<br><b>✗</b> Personalization kicks in on session 2 minimum. First-run examples stay generic.<br><b>—</b> Good fallback if B tests poorly: remove the pill, keep the inference.</div>
+  </div>
+</div>
+
+<!-- ── What we killed ───────────────────────────────────────────── -->
+<section class="kills">
+  <h3>What v4 explicitly kills (so we stop re-litigating)</h3>
+  <div class="cg">
+    <div class="cc"><h4><span class="tag r">killed</span>Separate onboarding route</h4>
+      <p>No <code>/welcome</code>, no wizard, no "let's show you around." First-run experience = enriched creator. Everything else is thrown away after 1 use — worst possible UI investment.</p>
+    </div>
+    <div class="cc"><h4><span class="tag r">killed</span>Left sidebar (v2 + v3 both)</h4>
+      <p>Chat-history sidebar (v2) was wrong: video projects are too heavy to list as text turns. Projects sidebar (v3) was wrong: competes with creator for attention on home, and a sidebar inside a project breaks focus on the artifact. Agency need → <b>All Projects</b> page via Home menu, not chronic chrome.</p>
+    </div>
+    <div class="cc"><h4><span class="tag r">killed</span>Persona as a gate</h4>
+      <p>Keynote slide 2 reads like a blocking step. v4 makes it a pill — dismissible, one-tap, top of creator. Returning users never see it again; deep-link and shared-link visitors never see it at all.</p>
+    </div>
+    <div class="cc"><h4><span class="tag g">kept</span>Scenarios as entry points</h4>
+      <p>The 6 cards ARE the keynote's "What do you want to do?" screen. They already branch the user into targeted bodies. No wizard needed — the scenario cards ARE the wizard, just flatter.</p>
+    </div>
+    <div class="cc"><h4><span class="tag g">kept</span>Templates-within-templates</h4>
+      <p><code>ScenarioPresetCards</code> stays. Motion graphics → templates. Video-gen → style presets. URL-to-ads → ad format presets. The "awesome, we have these templates below" beat maps 1:1.</p>
+    </div>
+    <div class="cc"><h4><span class="tag b">new</span>Prompt-reveal as first artifact</h4>
+      <p>Every new project's turn-1 artifact is a structured prompt card. User's messy input (drop + chips + free text) → AI-composed prompt → user edits inline → run. This is the magic <b>and</b> it teaches them the shape of the product in one beat. Not onboarding-gated — permanent product behavior.</p>
+    </div>
+    <div class="cc"><h4><span class="tag k">new</span>Mid-session "New project"</h4>
+      <p>Multi-intent users need a fast path to start a 2nd thread without losing the 1st. Solution: <b>"+ New"</b> button next to Home in the project top nav. Spawns a new project in a new tab (browser tab, not DOM tab) — the current project stays live. Matches how pros work.</p>
+    </div>
+    <div class="cc"><h4><span class="tag b">metric</span>What this should move vs v3</h4>
+      <ul>
+        <li>Signup → first-value (first prompt run): target ≤60s.</li>
+        <li>% new users who finish a scenario on turn 1 (teaching signal).</li>
+        <li>Day-1 return rate after a successful turn-1 export.</li>
+        <li>% sessions with ≥2 distinct scenarios (multi-intent validation).</li>
+      </ul>
+    </div>
+    <div class="cc"><h4><span class="tag k">phase</span>Ship order</h4>
+      <ul>
+        <li><b>P1</b> Add VO + music scenarios to <code>scenarios.ts</code>. Add persona pill above <code>ScenarioCardGrid</code>.</li>
+        <li><b>P2</b> Prompt-reveal card as first artifact in project chat.</li>
+        <li><b>P3</b> "+ New" in project top nav. Kill sidebar in <code>/editor</code>.</li>
+        <li><b>P4</b> Personalization: persona → scenario order + example picks.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="tw">
+  <h5>Tweaks</h5>
+  <label>Callouts<input type="checkbox" id="tw-c" checked></label>
+  <label>Paper<select id="tw-p"><option value="warm" selected>Warm</option><option value="cool">Cool</option><option value="bright">Bright</option></select></label>
+  <label>Persona<select id="tw-pr"><option value="Creator" selected>Creator</option><option value="Agency">Agency</option><option value="Podcast">Podcast</option><option value="Editor">Editor</option></select></label>
+</div>
+
+<script>
+const arrow = () => `<div class="ar"><svg viewBox="0 0 44 30" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15 C 12 10, 28 22, 40 15"/><path d="M33 8 L 40 15 L 33 22"/></svg></div>`;
+const bb = u => `<div class="bb"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">${u}</span><span class="av"></span></div>`;
+
+/* ── the 6 scenarios (from keynote slide 3, mapped to code scenarios.ts) */
+const SCENARIOS = [
+  {id:'talking-head',     t:'Edit talking head',    d:"I've already shot my footage",        code:'edit-talking-head'},
+  {id:'motion-graphics',  t:'Make motion graphics', d:'Stingers, lower-thirds, intros',      code:'motion-graphics'},
+  {id:'url-to-ads',       t:'UGC from a product',   d:'Link, images, and info',              code:'url-to-ads'},
+  {id:'video-gen',        t:'Generate AI videos',   d:'Veo, Kling, Seedance 2.0',            code:'video-gen', pro:true},
+  {id:'voiceover',        t:'Generate VO',          d:'Script → voice',                      code:'voiceover', newly:true},
+  {id:'music-gen',        t:'Generate music',       d:'Bed, sting, theme',                   code:'music-gen', newly:true},
+];
+
+const persona = (active='Creator', dismissed=false) => {
+  if(dismissed) return '';
+  const p = ['Creator','Agency','Podcast','Editor'];
+  return `
+    <div style="background:var(--warm);border:1.2px solid var(--ink);padding:5px 7px;">
+      <div style="font-family:'Kalam',cursive;font-size:10.5px;color:#555;display:flex;justify-content:space-between;align-items:baseline;">
+        <span>Quick thing — what brings you here?</span>
+        <span style="font-size:9px;opacity:.6;">skip ×</span>
+      </div>
+      <div class="persona" style="margin-top:3px;">
+        ${p.map(x=>`<span class="c ${x===active?'on':''}">${x}</span>`).join('')}
+      </div>
+    </div>`;
+};
+
+/* ── intent grid (the 6 cards) */
+const intentGrid = (selectedId=null) => `
+  <div style="font-family:'Caveat',cursive;font-size:15px;font-weight:600;">Hi. What do you want to do?</div>
+  <div class="intents">
+    ${SCENARIOS.map(s=>`
+      <div class="intent ${s.id===selectedId?'on':''}">
+        ${s.pro?'<span class="pro">PRO</span>':''}
+        <span class="t">${s.t}${s.newly?' <sup style="font-size:8px;color:#999;">NEW</sup>':''}</span>
+        <span class="d">${s.d}</span>
+      </div>`).join('')}
+  </div>
+  <div class="skip">Skip intro → blank project</div>
+`;
+
+/* ── branch bodies (keynote slides 4–8 mapped to scenarios) */
+const branchBody = (id) => {
+  if(id==='talking-head'){
+    return `
+      <div class="back">← back · <b style="font-family:Caveat,cursive;font-size:13px;">Edit talking head</b></div>
+      <div style="font-family:'Kalam',cursive;font-size:11.5px;color:#444;">Great! Upload your footage here. You can also select common requirements below.</div>
+      <div class="drop">drop .mp4 / .mov / .mp3 — or paste URL</div>
+      <div class="lbl">common requirements</div>
+      <div class="chips"><span class="c on">Remove filler words</span><span class="c on">Remove repeat takes</span><span class="c">Tighten pauses</span><span class="c">+ captions</span><span class="c">Vertical crop</span><span class="c">Auto-highlight</span></div>
+      <div class="lbl">or describe what you want</div>
+      <div class="fld" style="min-height:30px;">cut to 60s, keep the founder story, skip the intro</div>
+      <div class="btn p" style="text-align:center;padding:4px 0;font-size:11px;">Create project ▶</div>
+    `;
+  }
+  if(id==='motion-graphics'){
+    return `
+      <div class="back">← back · <b style="font-family:Caveat,cursive;font-size:13px;">Motion graphics</b></div>
+      <div style="font-family:'Kalam',cursive;font-size:11.5px;color:#444;">Awesome! We have these templates below — reference one, or make up your own.</div>
+      <div class="presets" style="grid-template-columns:repeat(3,1fr);">
+        <div class="preset on" style="background:linear-gradient(135deg,#3a5a2a,#6a9a5a);color:#fff;"><span class="b">stinger</span></div>
+        <div class="preset" style="background:linear-gradient(135deg,#5a4a3a,#9a7a5a);color:#fff;"><span class="b">lower-third</span></div>
+        <div class="preset" style="background:linear-gradient(135deg,#2a3a4a,#5a6a8a);color:#fff;"><span class="b">intro</span></div>
+        <div class="preset" style="background:linear-gradient(135deg,#4a2a3a,#8a5a6a);color:#fff;"><span class="b">outro</span></div>
+        <div class="preset" style="background:linear-gradient(135deg,#3a2a5a,#7a5aa0);color:#fff;"><span class="b">transition</span></div>
+        <div class="preset" style="background:var(--warm);color:#555;border-style:dashed;"><span class="b" style="background:none;color:#555;">+ own</span></div>
+      </div>
+      <div class="lbl">or describe your own</div>
+      <div class="fld" style="min-height:24px;">animated lower-third with my logo + name + role</div>
+      <div class="btn p" style="text-align:center;padding:4px 0;font-size:11px;">Create project ▶</div>
+    `;
+  }
+  if(id==='url-to-ads'){
+    return `
+      <div class="back">← back · <b style="font-family:Caveat,cursive;font-size:13px;">UGC from a product</b></div>
+      <div style="font-family:'Kalam',cursive;font-size:11.5px;color:#444;">Amazing! Send me your link, or your product images and info.</div>
+      <div class="lbl">product URL</div>
+      <div class="fld">https://rallyenergy.com/pineapple-mint</div>
+      <div class="lbl">or drop product images + info</div>
+      <div class="drop">drop images — we'll extract copy &amp; style</div>
+      <div class="lbl">ad format</div>
+      <div class="presets">
+        <div class="preset on" style="background:linear-gradient(160deg,#1a3a5a,#4a6aa0);color:#fff;"><span class="b">problem/sol</span></div>
+        <div class="preset" style="background:linear-gradient(160deg,#3a2a5a,#7a5aa0);color:#fff;"><span class="b">testimonial</span></div>
+        <div class="preset" style="background:linear-gradient(160deg,#5a3a3a,#9a6a6a);color:#fff;"><span class="b">unboxing</span></div>
+        <div class="preset" style="background:linear-gradient(160deg,#3a5a2a,#6a9a5a);color:#fff;"><span class="b">demo</span></div>
+      </div>
+      <div class="btn p" style="text-align:center;padding:4px 0;font-size:11px;">Create project ▶</div>
+    `;
+  }
+  if(id==='video-gen'){
+    return `
+      <div class="back">← back · <b style="font-family:Caveat,cursive;font-size:13px;">Generate AI videos</b></div>
+      <div style="font-family:'Kalam',cursive;font-size:11.5px;color:#444;">We can generate anything with SOTA models — tell us your idea.</div>
+      <div class="fld" style="min-height:44px;font-size:11px;">a cinematic slow-mo pour of neon blue liquid into a frosted glass, macro lens, studio light</div>
+      <div class="lbl">model <span style="font-size:9px;color:#888;">(free · or upgrade for Seedance 2.0)</span></div>
+      <div class="chips"><span class="c on">Veo 2</span><span class="c">Kling 1.6</span><span class="c" style="border-color:var(--acc);color:var(--acc);">⚡ Seedance 2.0 <b style="font-family:'IBM Plex Mono',monospace;font-size:7px;background:var(--acc);color:#fff;padding:0 3px;margin-left:2px;">PRO</b></span></div>
+      <div class="lbl">preset style</div>
+      <div class="presets">
+        <div class="preset on" style="background:linear-gradient(160deg,#3a2a5a,#7a5aa0);color:#fff;"><span class="b">cinematic</span></div>
+        <div class="preset" style="background:linear-gradient(160deg,#1a3a5a,#4a6aa0);color:#fff;"><span class="b">product</span></div>
+        <div class="preset" style="background:linear-gradient(160deg,#5a4a3a,#9a7a5a);color:#fff;"><span class="b">anime</span></div>
+        <div class="preset" style="background:linear-gradient(160deg,#3a5a2a,#6a9a5a);color:#fff;"><span class="b">doc</span></div>
+      </div>
+      <div class="btn p" style="text-align:center;padding:4px 0;font-size:11px;">Generate ▶</div>
+    `;
+  }
+  if(id==='voiceover'){
+    return `
+      <div class="back">← back · <b style="font-family:Caveat,cursive;font-size:13px;">Generate VO</b></div>
+      <div style="font-family:'Kalam',cursive;font-size:11.5px;color:#444;">Paste your script or describe the voice you want.</div>
+      <div class="lbl">script</div>
+      <div class="fld" style="min-height:44px;font-size:11px;">If you've ever tried to edit a 45-min interview to 60 seconds, you know…</div>
+      <div class="lbl">voice</div>
+      <div class="chips"><span class="c on">Warm male · US</span><span class="c">Warm female · US</span><span class="c">British · documentary</span><span class="c">+ clone your voice</span></div>
+      <div class="btn p" style="text-align:center;padding:4px 0;font-size:11px;">Generate VO ▶</div>
+    `;
+  }
+  if(id==='music-gen'){
+    return `
+      <div class="back">← back · <b style="font-family:Caveat,cursive;font-size:13px;">Generate music</b></div>
+      <div style="font-family:'Kalam',cursive;font-size:11.5px;color:#444;">Tell us the mood, genre, and how long.</div>
+      <div class="fld" style="min-height:36px;font-size:11px;">upbeat indie-pop bed, 45 seconds, builds at 0:20</div>
+      <div class="lbl">reference track (optional)</div>
+      <div class="drop" style="padding:6px;">drop mp3 / link spotify</div>
+      <div class="lbl">use case</div>
+      <div class="chips"><span class="c on">Bed under VO</span><span class="c">Sting</span><span class="c">Intro theme</span><span class="c">Background loop</span></div>
+      <div class="btn p" style="text-align:center;padding:4px 0;font-size:11px;">Generate music ▶</div>
+    `;
+  }
+  return '';
+};
+
+/* ── creator panel (a container for persona + grid OR branch body) */
+const creator = (opts={}) => {
+  const {selectedId=null, dismissedPersona=false, personaVal='Creator', title='New project'} = opts;
+  const body = selectedId ? branchBody(selectedId) : intentGrid(null);
+  return `
+    <div class="crt">
+      <div class="ti">${title} <small>· ${selectedId?SCENARIOS.find(s=>s.id===selectedId)?.t:'start here'}</small></div>
+      ${persona(personaVal, dismissedPersona)}
+      ${body}
+    </div>
+  `;
+};
+
+/* ── gallery (lifted from v3, trimmed) */
+const tile = (o) => `
+  <div class="tile ${o.empty?'em':''}">
+    <div class="thumb ${o.empty?'':'th-'+o.kind}">
+      ${o.empty?'<span style="font-family:Caveat,cursive;font-size:14px;color:#666;">+ new</span>':`<span class="kind">${o.kindLabel}</span><span class="play">▶</span><span class="dur">${o.dur}</span>`}
+    </div>
+    <div class="body"><b>${o.name}</b><span class="m">${o.meta}</span></div>
+  </div>
+`;
+const examplesGallery = (persona='Creator') => {
+  const perPersona = {
+    Creator:  [{kind:'head',kindLabel:'EDIT',name:'YouTube hook · 60s',dur:'1:00',meta:'Creator example'},
+               {kind:'vo',kindLabel:'GEN',name:'Script → VO',dur:'0:24',meta:'Creator example'},
+               {kind:'mg',kindLabel:'TMPL',name:'Lower-third',dur:'0:03',meta:'Creator example'}],
+    Agency:   [{kind:'ugc',kindLabel:'EDIT',name:'UGC — Rally Energy',dur:'0:15',meta:'Agency example'},
+               {kind:'ugc',kindLabel:'EDIT',name:'UGC — Notion',dur:'0:15',meta:'Agency example'},
+               {kind:'prm',kindLabel:'EDIT',name:'Product promo 30s',dur:'0:30',meta:'Agency example'}],
+    Podcast:  [{kind:'pod',kindLabel:'EDIT',name:'Podcast highlight reel',dur:'1:12',meta:'Podcast example'},
+               {kind:'pod',kindLabel:'EDIT',name:'Shorts from ep 14',dur:'0:58',meta:'Podcast example'},
+               {kind:'mus',kindLabel:'GEN',name:'Intro bed',dur:'0:20',meta:'Podcast example'}],
+    Editor:   [{kind:'int',kindLabel:'EDIT',name:'Interview cutdown',dur:'2:04',meta:'Editor example'},
+               {kind:'head',kindLabel:'EDIT',name:'Dialogue polish',dur:'1:48',meta:'Editor example'},
+               {kind:'mg',kindLabel:'TMPL',name:'Title card pack',dur:'—',meta:'Editor example'}],
+  };
+  const picks = perPersona[persona] || perPersona.Creator;
+  const more = [{kind:'ai',kindLabel:'GEN',name:'AI cinematic short',dur:'0:08',meta:'Veo 2 · example'},
+                {kind:'ugc',kindLabel:'EDIT',name:'UGC template',dur:'0:15',meta:'example'},
+                {kind:'mg',kindLabel:'TMPL',name:'Stinger pack',dur:'0:03',meta:'example'}];
+  return `
+    <div class="gal">
+      <div class="gtop">
+        <div class="gtabs"><div>Recent</div><div>Your projects</div><div class="on">Examples</div><div>Brand kits</div></div>
+        <div class="search">⌕ search</div>
+      </div>
+      <div style="font-family:'Caveat',cursive;font-size:15px;color:#444;">Picked for you · <span style="color:var(--acc2);">${persona}</span></div>
+      <div class="grid3">${picks.map(tile).join('')}</div>
+      <div style="font-family:'Caveat',cursive;font-size:14px;color:#444;margin-top:2px;">Other starting points</div>
+      <div class="grid3">${more.map(tile).join('')}</div>
+    </div>
+  `;
+};
+const recentGallery = () => `
+  <div class="gal">
+    <div class="gtop">
+      <div class="gtabs"><div class="on">Recent</div><div>Your projects</div><div>Examples</div><div>Brand kits</div></div>
+      <div class="search">⌕ search</div>
+    </div>
+    <div style="font-family:'Caveat',cursive;font-size:14px;color:#444;">Today</div>
+    <div class="grid3">
+      ${tile({kind:'head',kindLabel:'EDIT',name:'Founder interview · 60s',dur:'0:58',meta:'active · 2m ago'})}
+      ${tile({kind:'vo',kindLabel:'GEN',name:'Script · launch VO',dur:'0:24',meta:'12m ago'})}
+      ${tile({kind:'mg',kindLabel:'TMPL',name:'Intro stinger',dur:'0:03',meta:'1h ago · draft'})}
+    </div>
+    <div style="font-family:'Caveat',cursive;font-size:14px;color:#444;">Yesterday</div>
+    <div class="grid3">
+      ${tile({kind:'pod',kindLabel:'EDIT',name:'Podcast ep 14',dur:'1:12',meta:'exported'})}
+      ${tile({kind:'ugc',kindLabel:'EDIT',name:'UGC — Rally',dur:'0:15',meta:'shared'})}
+      ${tile({kind:'ai',kindLabel:'GEN',name:'Sizzle open',dur:'0:08',meta:'draft'})}
+    </div>
+  </div>`;
+
+/* ── project surface with prompt-reveal card (the aha moment) */
+const project = (variant='reveal') => {
+  let chat='', art='';
+  if(variant==='reveal'){
+    chat = `
+      <div class="msgs">
+        <div class="bub me"><span class="nm">YOU</span>cut my interview to 60 seconds, remove ums and repeat takes, pick the 3 strongest moments</div>
+        <div class="bub ai"><span class="nm">CHATCUT</span>Got it. I turned that into a structured prompt — review &amp; run, or tweak.
+          <div class="prompt">
+<b>INTENT:</b> edit talking-head<br>
+<b>SOURCE:</b> interview-final.mp4 (08:42)<br>
+<b>TARGET:</b> 00:60 ± 3s<br>
+<b>OPERATIONS:</b><br>
+&nbsp;• transcribe &amp; cue<br>
+&nbsp;• strip fillers [um, uh, y'know]<br>
+&nbsp;• drop repeat takes<br>
+&nbsp;• rank moments by signal · pick top 3<br>
+<b>OUTPUT:</b> MP4 · 1080p · original audio
+          </div>
+        </div>
+      </div>
+      <div class="comp"><div class="cc"><div class="c">Run ▶</div><div class="c">Edit prompt</div><div class="c">Add captions</div></div>
+        <div class="r"><div class="f">refine or ask a question…</div><div class="btn p xs">⏎</div></div>
+      </div>`;
+    art = `
+      <div class="ac blue"><div class="h"><span class="t">✨ prompt · v1</span><span class="m">AI-composed · editable</span></div>
+        <div style="font-size:10.5px;color:#555;line-height:1.4;">AI turned your messy input into a structured prompt. You can edit any line before running — or hit Run to go.</div>
+        <div style="background:var(--warm);border:1.2px solid var(--ink);padding:5px 7px;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;line-height:1.5;">
+          <b>intent</b>: edit talking-head<br>
+          <b>source</b>: interview-final.mp4<br>
+          <b>target</b>: 00:60 ± 3s<br>
+          <b>ops</b>: transcribe, strip [um,uh,y'know], drop repeats, rank · top 3<br>
+          <b>output</b>: MP4 · 1080p
+        </div>
+        <div style="display:flex;gap:4px;margin-top:5px;"><div class="btn xs">✎ Edit</div><div class="btn p xs">Run plan ▶</div></div>
+      </div>
+      <div class="ac"><div class="h"><span class="t">⤓ source</span><span class="m">interview-final.mp4 · 08:42</span></div>
+        <div class="ph" style="height:50px;">footage thumbnail · scrub →</div>
+      </div>`;
+  } else if(variant==='post-run'){
+    chat = `
+      <div class="msgs">
+        <div class="bub me" style="font-size:10px;"><span class="nm">YOU</span>Run ▶</div>
+        <div class="bub ai"><span class="nm">CHATCUT</span>Done — cut v1 is 0:58. Play, export, or ask for a change.</div>
+      </div>
+      <div class="comp"><div class="cc"><div class="c">+ captions</div><div class="c">vertical crop</div><div class="c">make 30s</div></div>
+        <div class="r"><div class="f">refine cut v1…</div><div class="btn p xs">⏎</div></div>
+      </div>`;
+    art = `
+      <div class="ac acc"><div class="h"><span class="t">▶ cut v1 · 0:58</span><span class="m">pinned · ready</span></div>
+        <div class="plyr">▶ preview · 0:58<div class="ctrl">◀◀ ▶ ▶▶ 0:12 / 0:58 ——————●——————— ⟲ ⤢</div></div>
+        <div style="display:flex;gap:4px;margin-top:5px;"><div class="btn xs">📝 transcript</div><div class="btn xs">▦ timeline</div><div class="btn xs">↗ share</div><div class="btn p xs" style="margin-left:auto;">⤓ Export</div></div>
+      </div>`;
+  }
+  return `
+    <div class="top">
+      <div class="home-btn"><span class="ic">⌂</span>Home</div>
+      <span class="crumb">/ Founder interview · 60s</span>
+      <div class="sp"></div>
+      <span class="btn xs">+ New project</span>
+      <span class="crumb">Auto-saved · 3:14pm</span>
+      <div class="btn xs">Share</div>
+      <div class="btn p xs">⤓ Export</div>
+    </div>
+    <div class="p-body">
+      <div class="chat">${chat}</div>
+      <div class="art">${art}</div>
+    </div>
+  `;
+};
+
+/* ── FRAMES */
+const creatorFrames = [
+  {
+    label:'T=0 · first landing', lc:'S2', size:'xl',
+    cap:'Signup → land here. Persona pill at top (dismissible), the 6 scenario cards below, example gallery filtered by default persona. NO modal, NO step-1/step-2/step-3.',
+    body:`${bb('app.chatcut.dev')}
+      <div class="sa">
+        <div class="top"><div class="home-btn"><span class="ic">⌂</span>Home</div><span class="crumb">welcome · creator</span><div class="sp"></div><span class="crumb">free plan</span><div class="btn xs">kw@chatcut</div></div>
+        <div class="h-body">${creator({selectedId:null, dismissedPersona:false, personaVal:'Creator'})}${examplesGallery('Creator')}</div>
+      </div>
+      <div class="callout b" style="left:4px;top:80px;">persona pill — ONE tap,<br/>dismissible with ×</div>
+      <div class="callout" style="left:4px;top:180px;">the 6 scenarios =<br/>keynote slide 3 · already code</div>
+      <div class="callout g" style="right:12px;top:80px;">examples pre-filtered<br/>by persona</div>
+      <div class="callout y" style="left:4px;top:440px;">"Skip intro" — keynote<br/>already exists (handleCreateBlankProject)</div>
+    `
+  },
+  {
+    label:'T=1 · persona picked, scenario picked', lc:'S2', size:'xl',
+    cap:'Agency persona chosen; user clicks "UGC from a product". Creator morphs in place to the branch body — URL field + image drop + ad format presets. Copy matches keynote slide 6 verbatim.',
+    body:`${bb('app.chatcut.dev')}
+      <div class="sa">
+        <div class="top"><div class="home-btn"><span class="ic">⌂</span>Home</div><span class="crumb">new project · UGC</span><div class="sp"></div><div class="btn xs">kw@chatcut</div></div>
+        <div class="h-body">${creator({selectedId:'url-to-ads', dismissedPersona:true, personaVal:'Agency'})}${examplesGallery('Agency')}</div>
+      </div>
+      <div class="callout" style="left:4px;top:80px;">persona dismissed —<br/>only appears once</div>
+      <div class="callout b" style="left:4px;top:160px;">"Amazing! Send me your<br/>link, or product images"<br/>= keynote slide 6</div>
+      <div class="callout g" style="right:12px;top:80px;">gallery re-filters —<br/>Agency examples now first</div>
+    `
+  },
+  {
+    label:'T=2 · prompt reveal (THE aha)', lc:'S3', size:'xl',
+    cap:'Create project → lands in /p/:id. First turn, user drops a messy sentence. AI returns a structured prompt card (artifact panel) — user can edit each line or hit Run. This is keynote slide 9, operationalized.',
+    body:`${bb('app.chatcut.dev/p/cuid_42')}
+      <div class="sa">${project('reveal')}</div>
+      <div class="callout" style="left:4px;top:80px;">Home ← always top-left,<br/>no sidebar anywhere</div>
+      <div class="callout b" style="right:12px;top:80px;">✨ prompt artifact —<br/>messy input becomes<br/>structured. editable.<br/>THE aha moment.</div>
+      <div class="callout g" style="left:310px;top:72px;">"+ New project" right in<br/>the top nav — multi-intent</div>
+    `
+  },
+  {
+    label:'T=3 · post-run, export-ready', lc:'S3', size:'xl',
+    cap:'User hit Run, 58s cut arrives. The same project shell. No timeline yet — most users export from here. The aha is now validated: they got what they asked for in ≤3 minutes from signup.',
+    body:`${bb('app.chatcut.dev/p/cuid_42')}
+      <div class="sa">${project('post-run')}</div>
+      <div class="callout" style="right:12px;top:80px;">validates aha:<br/>signup → export ≤3 min</div>
+    `
+  },
+];
+
+const multiFrames = [
+  {
+    label:'Multi-intent · in project', lc:'S3+', size:'l',
+    cap:'User finishes the interview edit and wants to generate a sting music bed for it. Click "+ New project" in top nav. Current project stays live in its tab; creator opens in a new tab.',
+    body:`${bb('app.chatcut.dev/p/cuid_42')}
+      <div class="sa">${project('post-run')}</div>
+      <div class="callout b" style="left:310px;top:72px;">click here to spawn a<br/>2nd project without<br/>leaving the 1st</div>
+    `
+  },
+  {
+    label:'Multi-intent · 2nd project spawned', lc:'S3+', size:'xl',
+    cap:'Creator opens fresh in a new browser tab. User picks Generate Music (NEW scenario). The 1st project is still running in its tab. This is how pros work today in Figma/Arc/Premiere — tabs, not modals.',
+    body:`${bb('app.chatcut.dev (new tab)')}
+      <div class="sa">
+        <div class="top"><div class="home-btn"><span class="ic">⌂</span>Home</div><span class="crumb">new project · music</span><div class="sp"></div><span class="crumb" style="color:var(--acc);">← 1 other project open</span><div class="btn xs">kw@chatcut</div></div>
+        <div class="h-body">${creator({selectedId:'music-gen', dismissedPersona:true, personaVal:'Creator'})}${recentGallery()}</div>
+      </div>
+      <div class="callout y" style="right:12px;top:80px;">Recent now shows<br/>the live project</div>
+      <div class="callout b" style="left:4px;top:80px;">music-gen is one<br/>of the 2 NEW scenarios</div>
+    `
+  },
+  {
+    label:'Agency — many parallel', lc:'S6', size:'l',
+    cap:'Agency user with 12 concurrent projects. "All projects" page reached via Home menu (not chronic sidebar). Filter chips + search. The creator panel is still here because starting project #13 is one click away.',
+    body:`${bb('app.chatcut.dev/projects')}
+      <div class="sa">
+        <div class="top"><div class="home-btn"><span class="ic">⌂</span>Home · All projects</div><span class="crumb">Rally Energy · team</span><div class="sp"></div><div class="btn xs">⊕ Invite</div><div class="btn xs">kw@chatcut</div></div>
+        <div class="h-body">
+          <div class="crt"><div class="ti">New project</div>${intentGrid(null)}</div>
+          <div class="gal">
+            <div class="gtop"><div class="gtabs"><div>Recent</div><div class="on">Your projects</div><div>Examples</div><div>Brand kits</div></div><div class="search">⌕ search</div></div>
+            <div class="chips" style="margin-bottom:3px;"><span class="c on">All · 12</span><span class="c">Drafts · 5</span><span class="c">Exported · 4</span><span class="c">Shared · 2</span><span class="c">Archived · 1</span></div>
+            <div class="grid4">
+              ${tile({kind:'head',kindLabel:'EDIT',name:'Founder interview v3',dur:'0:58',meta:'today'})}
+              ${tile({kind:'pod',kindLabel:'EDIT',name:'Podcast ep 14',dur:'1:12',meta:'today'})}
+              ${tile({kind:'ugc',kindLabel:'EDIT',name:'UGC — Rally',dur:'0:15',meta:'yesterday'})}
+              ${tile({kind:'mg',kindLabel:'TMPL',name:'Lower-third pack',dur:'—',meta:'yesterday'})}
+              ${tile({kind:'ai',kindLabel:'GEN',name:'Sizzle open',dur:'0:08',meta:'mon'})}
+              ${tile({kind:'int',kindLabel:'EDIT',name:'Interview · Martha',dur:'2:04',meta:'mon'})}
+              ${tile({kind:'vo',kindLabel:'GEN',name:'VO · product launch',dur:'0:24',meta:'sun'})}
+              ${tile({kind:'mus',kindLabel:'GEN',name:'Music · theme',dur:'0:20',meta:'sun'})}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="left:4px;top:80px;">All-projects page via<br/>Home MENU, not sidebar</div>
+    `
+  },
+];
+
+const edgeFrames = [
+  {
+    label:'Returning user · day 2', lc:'S5', size:'l',
+    cap:'Persona answered last session — gone. Scenarios still visible (users always need to start a new project). Gallery defaults to Recent now that they have work.',
+    body:`${bb('app.chatcut.dev')}
+      <div class="sa">
+        <div class="top"><div class="home-btn"><span class="ic">⌂</span>Home</div><span class="crumb">welcome back</span><div class="sp"></div><div class="btn xs">kw@chatcut</div></div>
+        <div class="h-body">${creator({selectedId:null, dismissedPersona:true, personaVal:'Creator'})}${recentGallery()}</div>
+      </div>
+      <div class="callout" style="left:4px;top:80px;">no persona chrome —<br/>already answered</div>
+      <div class="callout g" style="right:12px;top:80px;">Recent is default<br/>when you have work</div>
+    `
+  },
+  {
+    label:'Skip-intro (blank project)', lc:'S2', size:'m',
+    cap:'Power user clicks "Skip intro". Goes straight to an empty project with just a prompt field. Keynote already implemented as handleCreateBlankProject.',
+    body:`${bb('app.chatcut.dev/p/cuid_blank')}
+      <div class="sa">
+        <div class="top"><div class="home-btn"><span class="ic">⌂</span>Home</div><span class="crumb">/ Untitled</span><div class="sp"></div><div class="btn xs">kw@chatcut</div></div>
+        <div class="p-body" style="grid-template-columns:1fr;">
+          <div class="chat" style="border-right:none;align-items:center;justify-content:center;padding:40px;">
+            <div style="max-width:460px;text-align:center;">
+              <div style="font-family:'Caveat',cursive;font-size:22px;margin-bottom:6px;">What do you want to make?</div>
+              <div style="font-size:12px;color:#555;margin-bottom:12px;">Describe it, drop footage, or paste a URL.</div>
+              <div class="fld" style="min-height:80px;text-align:left;padding:8px 10px;">cut my interview to 60 seconds…</div>
+              <div style="margin-top:6px;text-align:right;"><span class="btn p xs">⏎ Create project</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="left:4px;top:80px;">for power users —<br/>zero-chrome path</div>
+    `
+  },
+  {
+    label:'Shared-link visitor (anon)', lc:'S6', size:'m',
+    cap:'External viewer opens /p/:id?share=ro. No creator, no persona, no Home. They see the artifact + a Fork CTA. Onboarding for THEM happens only if they click Fork.',
+    body:`${bb('app.chatcut.dev/p/cuid_42?share=ro')}
+      <div class="sa">
+        <div class="top"><span class="crumb">READ-ONLY · shared by Kai</span><div class="sp"></div><div class="btn xs">↗ Fork to my projects</div><div class="btn xs">⊕ Sign in</div></div>
+        <div class="p-body">
+          <div class="chat"><div class="msgs">
+            <div class="bub ai"><span class="nm">CHATCUT</span>Here's <b>Founder interview · 60s</b>. Kai shared it with you.</div>
+            <div class="bub ai" style="font-size:10px;opacity:.7;">… chat history hidden · fork to continue</div>
+          </div></div>
+          <div class="art">
+            <div class="ac acc"><div class="h"><span class="t">▶ cut v2 · 0:58</span><span class="m">pinned · exported</span></div>
+              <div class="plyr" style="height:130px;">▶ preview<div class="ctrl">0:12 / 0:58 ——————●————————</div></div>
+              <div style="display:flex;gap:4px;margin-top:4px;"><div class="btn xs">↗ Fork</div><div class="btn xs">💬 Comment</div><div class="btn p xs" style="margin-left:auto;">⤓ Download</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="left:4px;top:80px;">no creator · no persona —<br/>they're not a user yet</div>
+    `
+  },
+];
+
+const paint = (id, frames) => {
+  const el = document.getElementById(id);
+  frames.forEach((f,i)=>{
+    if(i>0) el.insertAdjacentHTML('beforeend', arrow());
+    const fw = document.createElement('div');
+    fw.className='fw';
+    fw.innerHTML = `
+      <div class="fl"><span class="x">step ${i+1}</span>${f.label} <span class="y">${f.lc}</span></div>
+      <div class="fr ${f.size}">${f.body}</div>
+      <div class="cap">${f.cap}</div>
+    `;
+    el.appendChild(fw);
+  });
+};
+paint('creator', creatorFrames);
+paint('multi', multiFrames);
+paint('edge', edgeFrames);
+
+/* Tweaks */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"showCallouts":true,"paperTone":"warm","persona":"Creator"}/*EDITMODE-END*/;
+const tw = {...TWEAK_DEFAULTS};
+function apply(){
+  document.querySelectorAll('.callout').forEach(e=>{e.style.display = tw.showCallouts?'':'none';});
+  const r = document.documentElement;
+  if(tw.paperTone==='cool'){r.style.setProperty('--paper','#f5f7fa');r.style.setProperty('--warm','#eaeef4');}
+  else if(tw.paperTone==='bright'){r.style.setProperty('--paper','#fff');r.style.setProperty('--warm','#f2f2f2');}
+  else {r.style.setProperty('--paper','#fafaf7');r.style.setProperty('--warm','#f4f1ea');}
+}
+const twEl=document.getElementById('tw');
+const twC=document.getElementById('tw-c');
+const twP=document.getElementById('tw-p');
+const twPr=document.getElementById('tw-pr');
+twC.checked=tw.showCallouts; twP.value=tw.paperTone; twPr.value=tw.persona;
+twC.addEventListener('change',()=>{tw.showCallouts=twC.checked;apply();try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{showCallouts:tw.showCallouts}},'*');}catch(e){}});
+twP.addEventListener('change',()=>{tw.paperTone=twP.value;apply();try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{paperTone:tw.paperTone}},'*');}catch(e){}});
+twPr.addEventListener('change',()=>{tw.persona=twPr.value;try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{persona:tw.persona}},'*');}catch(e){}});
+window.addEventListener('message',e=>{const d=e.data||{};if(d.type==='__activate_edit_mode')twEl.classList.add('on');else if(d.type==='__deactivate_edit_mode')twEl.classList.remove('on');});
+try{window.parent.postMessage({type:'__edit_mode_available'},'*');}catch(e){}
+apply();
+</script>
+</body>
+</html>

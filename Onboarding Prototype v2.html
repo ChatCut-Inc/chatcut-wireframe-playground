@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ChatCut — Interactive Onboarding Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--paper:#fafaf7;--warm:#f4f1ea;--faint:#cfcabd;
+  --acc:oklch(58% 0.14 28);--acc2:oklch(58% 0.14 220);--acc3:oklch(62% 0.12 140);--acc4:oklch(70% 0.15 65);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#e8e4d8;color:var(--ink);font-family:'Kalam',cursive;height:100%;}
+body{display:flex;flex-direction:column;min-height:100vh;}
+
+/* dev toggle strip */
+.dev{display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--ink);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;}
+.dev .brand{font-family:'Caveat',cursive;font-size:18px;font-weight:700;letter-spacing:0;}
+.dev .sp{flex:1;}
+.dev .grp{display:flex;gap:2px;border:1px solid #555;border-radius:3px;overflow:hidden;}
+.dev .grp b{background:transparent;color:#ccc;padding:2px 8px;cursor:pointer;font-weight:500;border:none;font-family:inherit;font-size:10.5px;letter-spacing:.06em;}
+.dev .grp b.on{background:#fff;color:var(--ink);}
+.dev button.x{background:transparent;color:#ccc;border:1px solid #555;padding:2px 8px;cursor:pointer;font-family:inherit;font-size:10.5px;letter-spacing:.06em;border-radius:3px;}
+.dev button.x:hover{color:#fff;border-color:#888;}
+
+/* browser tab strip */
+.tabstrip{display:flex;gap:0;padding:6px 10px 0;background:#d4cfbf;border-bottom:1px solid var(--ink);align-items:flex-end;}
+.tabstrip .t{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#e8e4d8;border:1px solid var(--ink);border-bottom:none;border-radius:6px 6px 0 0;font-size:12px;cursor:pointer;max-width:240px;position:relative;top:1px;}
+.tabstrip .t.on{background:var(--paper);font-weight:700;z-index:2;}
+.tabstrip .t .close{opacity:.4;font-size:11px;}
+.tabstrip .t .close:hover{opacity:1;color:var(--acc);}
+.tabstrip .t .dot{width:8px;height:8px;border-radius:50%;background:var(--acc3);display:inline-block;}
+.tabstrip .t .dot.idle{background:#aaa;}
+.tabstrip .t .dot.running{background:var(--acc4);animation:pulse 1.2s ease-in-out infinite;}
+.tabstrip .add{padding:6px 10px;color:#555;cursor:pointer;font-size:14px;}
+.tabstrip .add:hover{color:var(--ink);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* frame (the "browser window" holding the app) */
+.frame{flex:1;background:var(--paper);border-top:none;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+
+/* top chrome (app-level) */
+.top{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1.2px solid var(--ink);background:#fff;font-size:12px;}
+.home{font-family:'Caveat',cursive;font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.home .ic{width:18px;height:18px;border:1.5px solid var(--ink);border-radius:4px;background:var(--warm);display:grid;place-items:center;font-size:10px;}
+.home:hover .ic{background:var(--acc4);}
+.top .crumb{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;}
+.top .sp{flex:1;}
+.top .newbtn{font-family:'Kalam',cursive;font-size:12px;padding:2px 8px;border:1.2px solid var(--ink);background:#fff;cursor:pointer;box-shadow:1.5px 1.5px 0 var(--ink);}
+.top .newbtn:hover{background:var(--warm);}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 7px;border:1px solid var(--ink);background:var(--warm);letter-spacing:.06em;}
+
+/* body layouts */
+.h-body{flex:1;display:grid;grid-template-columns:400px 1fr;min-height:0;overflow:hidden;}
+.p-body{flex:1;display:grid;grid-template-columns:340px 1fr;min-height:0;overflow:hidden;}
+
+/* creator panel */
+.crt{border-right:1.5px solid var(--ink);padding:14px 16px;background:var(--paper);display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.crt h1{font-family:'Caveat',cursive;font-size:26px;font-weight:700;line-height:1;margin:0 2px;}
+.crt h1 small{font-family:'Kalam',cursive;font-size:14px;color:#555;font-weight:400;display:block;margin-top:2px;}
+
+.persona{background:var(--warm);border:1.2px solid var(--ink);padding:8px 10px;position:relative;}
+.persona .q{font-size:12px;color:#444;display:flex;justify-content:space-between;align-items:baseline;}
+.persona .q .x{cursor:pointer;color:#888;font-size:14px;line-height:1;padding:0 2px;}
+.persona .q .x:hover{color:var(--acc);}
+.persona .chips{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.persona .c{border:1.2px solid var(--ink);padding:2px 10px;font-size:12px;background:#fff;cursor:pointer;font-family:'Kalam',cursive;}
+.persona .c:hover{background:var(--acc4);}
+.persona .c.on{background:var(--ink);color:#fff;}
+
+.qprompt{font-family:'Caveat',cursive;font-size:20px;font-weight:700;margin:2px 2px -2px;}
+
+.intents{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.intent{border:1.2px solid var(--ink);background:#fff;padding:8px 10px;display:flex;flex-direction:column;gap:2px;cursor:pointer;position:relative;box-shadow:2px 2px 0 var(--ink);transition:transform .08s;}
+.intent:hover{background:var(--warm);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);}
+.intent.on{background:var(--warm);outline:2px solid var(--acc);}
+.intent .t{font-family:'Caveat',cursive;font-size:16px;font-weight:700;line-height:1.1;}
+.intent .d{font-size:11px;color:#555;line-height:1.25;}
+.intent .pro{position:absolute;top:3px;right:3px;background:var(--acc);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:8px;padding:0 4px;letter-spacing:.05em;}
+.intent .newly{font-size:8.5px;color:#888;vertical-align:super;font-family:'IBM Plex Mono',monospace;}
+
+.skip{font-family:'Kalam',cursive;font-size:12px;text-decoration:underline;color:#555;text-align:center;cursor:pointer;padding:4px;}
+.skip:hover{color:var(--ink);}
+
+.back{font-family:'Kalam',cursive;font-size:12px;color:#555;cursor:pointer;}
+.back:hover{color:var(--ink);}
+.back b{font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:var(--ink);}
+
+.sub{font-family:'Kalam',cursive;font-size:13px;color:#333;line-height:1.35;}
+.lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#555;letter-spacing:.06em;text-transform:uppercase;margin-top:3px;}
+.fld{border:1.2px solid var(--ink);padding:5px 9px;font-size:12px;background:#fff;color:#333;min-height:30px;font-family:'Kalam',cursive;cursor:text;}
+.fld:focus{outline:2px solid var(--acc2);outline-offset:1px;}
+.fld.area{min-height:50px;line-height:1.35;}
+.drop{border:1.5px dashed var(--ink);padding:14px;text-align:center;background:var(--warm);font-size:12px;color:#555;cursor:pointer;}
+.drop:hover{background:#ece6d4;}
+.drop.has{border-style:solid;background:#fff;color:var(--ink);}
+
+.chips{display:flex;gap:5px;flex-wrap:wrap;}
+.chips .c{border:1.2px solid var(--ink);padding:2px 9px;font-size:11px;background:#fff;cursor:pointer;font-family:'Kalam',cursive;}
+.chips .c:hover{background:var(--warm);}
+.chips .c.on{background:var(--ink);color:#fff;}
+.chips .c.pro-chip{border-color:var(--acc);color:var(--acc);}
+.chips .c.pro-chip .tag{background:var(--acc);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:7.5px;padding:0 3px;margin-left:3px;}
+
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.preset{border:1.2px solid var(--ink);aspect-ratio:1.4/1;display:flex;align-items:flex-end;padding:4px 5px;position:relative;overflow:hidden;cursor:pointer;}
+.preset:hover{outline:2px solid var(--ink);outline-offset:-2px;}
+.preset.on{outline:2.5px solid var(--acc);outline-offset:-2px;}
+.preset .b{background:rgba(0,0,0,.6);color:#fff;padding:0 4px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.04em;}
+.preset.dash{background:var(--warm);border-style:dashed;}
+.preset.dash .b{background:none;color:#555;}
+
+.go{background:var(--ink);color:#fff;text-align:center;padding:7px;font-family:'Caveat',cursive;font-size:16px;font-weight:700;cursor:pointer;box-shadow:2px 2px 0 var(--acc);margin-top:4px;border:1.2px solid var(--ink);}
+.go:hover{background:var(--acc);box-shadow:2px 2px 0 var(--ink);}
+.go.dim{background:#888;cursor:not-allowed;box-shadow:2px 2px 0 #666;}
+
+/* gallery */
+.gal{padding:14px 18px;background:var(--warm);overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.gtop{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.gtabs{display:flex;border-bottom:1.2px solid var(--ink);flex:1;}
+.gtabs div{font-size:13px;padding:5px 12px;border:1.2px solid transparent;border-bottom:1.5px solid var(--faint);color:#555;cursor:pointer;font-family:'Kalam',cursive;}
+.gtabs div.on{border:1.5px solid var(--ink);border-bottom:2px solid var(--warm);color:var(--ink);background:var(--warm);position:relative;bottom:-1.5px;font-weight:700;}
+.search{border:1.2px solid var(--faint);padding:4px 9px;font-size:11px;color:#555;background:#fff;width:160px;font-family:'Kalam',cursive;}
+.gsec{font-family:'Caveat',cursive;font-size:17px;color:#444;margin-bottom:-4px;}
+.gsec b{color:var(--acc2);font-weight:700;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.tile{border:1.2px solid var(--ink);background:#fff;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--ink);cursor:pointer;transition:transform .08s;}
+.tile:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);}
+.tile .thumb{aspect-ratio:16/9;border-bottom:1.2px solid var(--ink);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.tile .thumb .dur{position:absolute;bottom:3px;right:3px;background:rgba(0,0,0,.75);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;padding:0 5px;}
+.tile .thumb .kind{position:absolute;top:3px;left:3px;background:#fff;color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:8px;padding:1px 4px;border:1px solid var(--ink);letter-spacing:.04em;}
+.tile .thumb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(0,0,0,.7);}
+.tile .body{padding:6px 9px;}
+.tile .body b{font-family:'Caveat',cursive;font-size:14px;font-weight:700;display:block;line-height:1.1;}
+.tile .body .m{color:#555;font-size:10px;font-family:'Kalam',cursive;display:block;margin-top:1px;}
+.tile.em{border-style:dashed;background:transparent;box-shadow:none;}
+.tile.em .thumb{background:transparent;color:#666;}
+.th-head{background:linear-gradient(135deg,#5a4a3a,#9a7a5a);}
+.th-ugc{background:linear-gradient(160deg,#1a3a5a,#4a6aa0);}
+.th-ai{background:linear-gradient(160deg,#3a2a5a,#7a5aa0);}
+.th-mg{background:linear-gradient(135deg,#3a5a2a,#6a9a5a);}
+.th-vo{background:linear-gradient(135deg,#5a3a3a,#9a6a6a);}
+.th-pod{background:linear-gradient(135deg,#2a3a4a,#5a6a8a);}
+.th-mus{background:linear-gradient(135deg,#4a3a5a,#8a6aaa);}
+.th-int{background:linear-gradient(135deg,#4a2a3a,#8a5a6a);}
+.th-prm{background:linear-gradient(135deg,#3a4a3a,#7a8a6a);}
+
+/* project surface */
+.chat{border-right:1.5px solid var(--ink);background:var(--paper);display:flex;flex-direction:column;min-height:0;}
+.msgs{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
+.bub{border:1.2px solid var(--ink);padding:7px 10px;font-size:13px;line-height:1.4;background:#fff;max-width:94%;font-family:'Kalam',cursive;}
+.bub.ai{align-self:flex-start;background:var(--warm);}
+.bub.me{align-self:flex-end;background:var(--ink);color:#fff;}
+.bub .nm{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#666;letter-spacing:.06em;display:block;margin-bottom:3px;}
+.bub.me .nm{color:#fff;opacity:.6;}
+.bub .prompt{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#fff;border:1px solid var(--faint);padding:5px 7px;margin-top:5px;line-height:1.5;color:#333;}
+.comp{border-top:1.2px solid var(--ink);padding:8px 10px 10px;background:var(--warm);}
+.comp .cc{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.comp .cc .c{border:1.2px solid var(--ink);padding:2px 7px;font-size:10.5px;background:#fff;cursor:pointer;font-family:'Kalam',cursive;}
+.comp .cc .c:hover{background:var(--acc4);}
+.comp .r{display:flex;gap:6px;align-items:center;}
+.comp .f{flex:1;border:1.2px solid var(--ink);padding:5px 9px;font-size:12px;background:#fff;color:#333;font-family:'Kalam',cursive;}
+.comp .send{background:var(--ink);color:#fff;padding:5px 10px;font-family:'Kalam',cursive;font-size:13px;cursor:pointer;border:1.2px solid var(--ink);}
+.comp .send:hover{background:var(--acc);}
+
+.art{padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--warm);overflow-y:auto;}
+.ac{border:1.2px solid var(--ink);background:#fff;padding:10px;box-shadow:3px 3px 0 var(--ink);}
+.ac.blue{border-color:var(--acc2);box-shadow:3px 3px 0 var(--acc2);}
+.ac.acc{border-color:var(--acc);box-shadow:3px 3px 0 var(--acc);}
+.ac .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.ac .h .t{font-family:'Caveat',cursive;font-size:16px;font-weight:700;}
+.ac .h .m{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;}
+.ac .promptbox{background:var(--warm);border:1.2px solid var(--ink);padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;}
+.ac .promptbox .k{color:#888;}
+.ac .row{display:flex;gap:5px;margin-top:6px;}
+.ac .btn{border:1.2px solid var(--ink);padding:3px 9px;font-size:11px;background:#fff;cursor:pointer;font-family:'Kalam',cursive;box-shadow:1.5px 1.5px 0 var(--ink);}
+.ac .btn:hover{background:var(--warm);}
+.ac .btn.p{background:var(--ink);color:#fff;box-shadow:1.5px 1.5px 0 var(--acc);}
+.ac .btn.p:hover{background:var(--acc);}
+.ac .btn.ml{margin-left:auto;}
+.plyr{height:180px;background:#1a1a1a;color:#fff;position:relative;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;cursor:pointer;}
+.plyr::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:22px solid #fff;border-top:14px solid transparent;border-bottom:14px solid transparent;opacity:.9;}
+.plyr .ctrl{position:absolute;bottom:0;left:0;right:0;height:20px;background:#111;border-top:1px solid #333;display:flex;align-items:center;gap:7px;padding:0 8px;font-size:9.5px;color:#aaa;}
+.ac .ph{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.08) 6px 7px),var(--warm);border:1.2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;padding:4px;height:70px;}
+
+/* running animation */
+.running-art{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;color:#555;}
+.running-art .spinner{width:40px;height:40px;border:3px solid var(--faint);border-top-color:var(--acc);border-radius:50%;animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.running-art .lbl{font-family:'Caveat',cursive;font-size:18px;}
+.running-art .sub{font-size:12px;color:#777;}
+
+/* dialogs */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:90;}
+.modal.on{display:flex;}
+.modal .box{background:var(--paper);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:20px 24px;max-width:420px;width:90%;}
+.modal h3{font-family:'Caveat',cursive;font-size:26px;margin:0 0 6px;font-weight:700;}
+.modal p{font-size:13px;color:#444;margin:4px 0 14px;line-height:1.4;}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;}
+.modal .actions button{border:1.2px solid var(--ink);padding:5px 12px;font-family:'Kalam',cursive;font-size:13px;cursor:pointer;background:#fff;box-shadow:2px 2px 0 var(--ink);}
+.modal .actions button:hover{background:var(--warm);}
+.modal .actions button.p{background:var(--ink);color:#fff;box-shadow:2px 2px 0 var(--acc);}
+.modal .actions button.p:hover{background:var(--acc);}
+
+/* shared-link view */
+.ro-banner{background:var(--acc4);border-bottom:1.2px solid var(--ink);padding:5px 14px;font-size:12px;display:flex;align-items:center;gap:10px;}
+.ro-banner .pill{background:var(--ink);color:#fff;}
+
+/* hidden states */
+.hidden{display:none !important;}
+
+/* tweaks panel */
+#tw{position:fixed;bottom:20px;right:20px;width:260px;border:2px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink);padding:14px 16px;font-size:13px;z-index:60;display:none;}
+#tw.on{display:block;}
+#tw h5{font-family:'Caveat',cursive;font-size:22px;margin:0 0 8px;font-weight:700;}
+#tw label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:12px;}
+#tw select, #tw input{font-family:'Kalam',cursive;font-size:12px;border:1.2px solid var(--ink);padding:1px 4px;background:#fff;}
+</style>
+</head>
+<body>
+
+<!-- dev toggle strip (persistent, toolbar) -->
+<div class="dev">
+  <span class="brand">ChatCut · onboarding prototype</span>
+  <span class="sp"></span>
+  <span>start state:</span>
+  <span class="grp" id="state-grp">
+    <b data-state="first" class="on">first-run</b>
+    <b data-state="returning">returning</b>
+    <b data-state="shared">shared-link</b>
+  </span>
+  <button class="x" id="reset">⟲ reset</button>
+</div>
+
+<!-- main frame hosts whichever project is active -->
+<div class="frame" id="frame"></div>
+
+<!-- premium upsell modal -->
+<div class="modal" id="premium-modal">
+  <div class="box">
+    <h3>Seedance 2.0 is a premium model.</h3>
+    <p>Generate with state-of-the-art AI — 1080p, cinema motion, physics that actually work. Or keep exploring free models.</p>
+    <div class="actions">
+      <button id="pm-other">Try other stuff</button>
+      <button class="p" id="pm-upgrade">Upgrade membership →</button>
+    </div>
+  </div>
+</div>
+
+<div id="tw">
+  <h5>Tweaks</h5>
+  <label>Persona<select id="tw-persona"><option>Creator</option><option>Agency</option><option>Podcast</option><option>Editor</option></select></label>
+  <label>Show persona pill<input type="checkbox" id="tw-showpersona" checked></label>
+  <label>Compact density<input type="checkbox" id="tw-compact"></label>
+  <label>Debug jumper<select id="tw-jump"><option value="">— jump to —</option><option value="creator">Creator (home)</option><option value="branch:talking-head">Branch · talking head</option><option value="branch:motion-graphics">Branch · motion graphics</option><option value="branch:url-to-ads">Branch · UGC</option><option value="branch:video-gen">Branch · AI video</option><option value="branch:voiceover">Branch · VO</option><option value="branch:music-gen">Branch · music</option><option value="reveal">Project · prompt reveal</option><option value="running">Project · running</option><option value="post">Project · post-run</option></select></label>
+</div>
+
+<script>
+// ───────────────────────────────────────────────────────────────
+// DATA
+// ───────────────────────────────────────────────────────────────
+const SCENARIOS = [
+  {id:'talking-head',    t:'Edit talking head',    d:"I've already shot my footage"},
+  {id:'motion-graphics', t:'Make motion graphics', d:'Stingers, lower-thirds, intros'},
+  {id:'url-to-ads',      t:'UGC from a product',   d:'Link, images, and info'},
+  {id:'video-gen',       t:'Generate AI videos',   d:'Veo, Kling, Seedance 2.0', pro:true},
+  {id:'voiceover',       t:'Generate VO',          d:'Script → voice', newly:true},
+  {id:'music-gen',       t:'Generate music',       d:'Bed, sting, theme', newly:true},
+];
+
+// Templates-within-templates — the real ScenarioPresetCards pattern
+const PRESETS = {
+  'motion-graphics':[
+    {id:'stinger',    name:'Stinger',     cls:'th-mg'},
+    {id:'lt',         name:'Lower-third', cls:'th-head'},
+    {id:'intro',      name:'Intro',       cls:'th-pod'},
+    {id:'outro',      name:'Outro',       cls:'th-int'},
+    {id:'transition', name:'Transition',  cls:'th-ai'},
+    {id:'custom',     name:'+ your own',  dash:true},
+  ],
+  'url-to-ads':[
+    {id:'problem',     name:'Problem/Sol', cls:'th-ugc'},
+    {id:'testimonial', name:'Testimonial', cls:'th-ai'},
+    {id:'unboxing',    name:'Unboxing',    cls:'th-vo'},
+    {id:'demo',        name:'Product demo',cls:'th-mg'},
+    {id:'compare',     name:'Compare',     cls:'th-pod'},
+    {id:'custom',      name:'+ your own',  dash:true},
+  ],
+  'video-gen':[
+    {id:'cinematic', name:'Cinematic',cls:'th-ai'},
+    {id:'product',   name:'Product',  cls:'th-ugc'},
+    {id:'anime',     name:'Anime',    cls:'th-head'},
+    {id:'doc',       name:'Docu',     cls:'th-mg'},
+  ],
+};
+
+const EXAMPLE_GALLERY = {
+  Creator: [
+    {kind:'head',kl:'EDIT',name:'YouTube hook · 60s',dur:'1:00',meta:'Creator example'},
+    {kind:'vo',kl:'GEN',name:'Script → VO',dur:'0:24',meta:'Creator example'},
+    {kind:'mg',kl:'TMPL',name:'Lower-third',dur:'0:03',meta:'Creator example'},
+  ],
+  Agency:[
+    {kind:'ugc',kl:'EDIT',name:'UGC — Rally Energy',dur:'0:15',meta:'Agency example'},
+    {kind:'ugc',kl:'EDIT',name:'UGC — Notion',dur:'0:15',meta:'Agency example'},
+    {kind:'prm',kl:'EDIT',name:'Product promo 30s',dur:'0:30',meta:'Agency example'},
+  ],
+  Podcast:[
+    {kind:'pod',kl:'EDIT',name:'Podcast highlight reel',dur:'1:12',meta:'Podcast example'},
+    {kind:'pod',kl:'EDIT',name:'Shorts from ep 14',dur:'0:58',meta:'Podcast example'},
+    {kind:'mus',kl:'GEN',name:'Intro bed',dur:'0:20',meta:'Podcast example'},
+  ],
+  Editor:[
+    {kind:'int',kl:'EDIT',name:'Interview cutdown',dur:'2:04',meta:'Editor example'},
+    {kind:'head',kl:'EDIT',name:'Dialogue polish',dur:'1:48',meta:'Editor example'},
+    {kind:'mg',kl:'TMPL',name:'Title card pack',dur:'—',meta:'Editor example'},
+  ],
+};
+const MORE_EXAMPLES = [
+  {kind:'ai',kl:'GEN',name:'AI cinematic short',dur:'0:08',meta:'Veo 2 · example'},
+  {kind:'ugc',kl:'EDIT',name:'UGC template',dur:'0:15',meta:'example'},
+  {kind:'mg',kl:'TMPL',name:'Stinger pack',dur:'0:03',meta:'example'},
+];
+
+// branch-specific content
+const BRANCH_COPY = {
+  'talking-head':{
+    hello:'Great! Upload your footage here. You can also select common requirements below.',
+    placeholder:'cut to 60s, keep the founder story, skip the intro',
+  },
+  'motion-graphics':{
+    hello:'Awesome! We have these templates below — reference one, or make up your own.',
+    placeholder:'animated lower-third with my logo + name + role',
+  },
+  'url-to-ads':{
+    hello:'Amazing! Send me your link, or your product images and info.',
+    placeholder:'make it playful, 15 seconds, for instagram',
+  },
+  'video-gen':{
+    hello:'We can generate anything with SOTA models — tell us your idea.',
+    placeholder:'a cinematic slow-mo pour of neon blue liquid into a frosted glass, macro lens, studio light',
+  },
+  'voiceover':{
+    hello:'Paste your script or describe the voice you want.',
+    placeholder:'If you\'ve ever tried to edit a 45-min interview to 60 seconds…',
+  },
+  'music-gen':{
+    hello:'Tell us the mood, genre, and how long.',
+    placeholder:'upbeat indie-pop bed, 45 seconds, builds at 0:20',
+  },
+};
+
+// ───────────────────────────────────────────────────────────────
+// STATE
+// ───────────────────────────────────────────────────────────────
+const state = {
+  startState:'first',       // 'first' | 'returning' | 'shared'
+  persona:'Creator',
+  personaAnswered:false,    // true = pill is hidden
+  showPersona:true,
+  compact:false,
+  tabs:[],                  // {id, title, phase, scenarioId, projectName, cutReady, running}
+  activeTabId:null,
+  galleryTab:'Examples',
+  tabCounter:1,
+  promptInput:'',
+  sharedRouted:false,
+};
+
+function freshCreatorTab(){
+  return {
+    id:'t'+(state.tabCounter++),
+    title:'New project',
+    phase:'creator',        // 'creator' | 'branch' | 'reveal' | 'running' | 'post'
+    scenarioId:null,
+    selectedChips:{},       // chipId → true
+    selectedPreset:null,
+    promptText:'',
+    projectName:'Untitled project',
+    sourceAttached:false,
+    cutReady:false,
+  };
+}
+
+function freshProjectTab(opts){
+  // e.g. the demo "already in-progress" project for returning user
+  return Object.assign(freshCreatorTab(), opts);
+}
+
+// ───────────────────────────────────────────────────────────────
+// INIT / RESET
+// ───────────────────────────────────────────────────────────────
+function reset(){
+  if(state.startState==='first'){
+    state.persona='Creator';
+    state.personaAnswered=false;
+    state.galleryTab='Recent';
+    state.tabs=[freshCreatorTab()];
+  } else if(state.startState==='returning'){
+    state.persona='Creator';
+    state.personaAnswered=true;
+    state.galleryTab='Recent';
+    // Returning user lands on Home (fresh creator). Their in-progress project lives in Recent and is resumable from there.
+    state.tabs=[freshCreatorTab()];
+    state.tabCounter=2;
+  } else if(state.startState==='shared'){
+    state.tabs=[{id:'t-shared', title:'Founder interview · shared', phase:'shared-link'}];
+  }
+  state.activeTabId = state.tabs[0].id;
+  state.sharedRouted = (state.startState==='shared');
+  render();
+}
+
+// ───────────────────────────────────────────────────────────────
+// RENDER
+// ───────────────────────────────────────────────────────────────
+function $(sel){return document.querySelector(sel);}
+function curTab(){return state.tabs.find(t=>t.id===state.activeTabId);}
+
+function renderFrame(){
+  const t = curTab();
+  const f = $('#frame');
+  if(!t){ f.innerHTML=''; return; }
+  if(t.phase==='shared-link'){ f.innerHTML = renderSharedLink(); return; }
+  if(t.phase==='creator' || t.phase==='branch'){ f.innerHTML = renderHome(t); return; }
+  // project phases
+  f.innerHTML = renderProject(t);
+}
+
+function renderHome(t){
+  const personaHtml = '';
+
+  const crtBody = t.phase==='creator'
+    ? renderIntentGrid(t)
+    : renderBranchBody(t);
+
+  return `
+    ${renderTopBar(t)}
+    <div class="h-body">
+      <div class="crt">
+        <h1>${escapeHtml(t.title)}${t.phase==='creator'?'<small>start here</small>':''}</h1>
+        ${personaHtml}
+        ${crtBody}
+      </div>
+      ${renderGallery()}
+    </div>
+  `;
+}
+
+function renderTopBar(t, opts={}){
+  const crumb = opts.crumb || (t.phase==='creator'?'welcome · creator':(t.phase==='branch'?'new project · '+(SCENARIOS.find(s=>s.id===t.scenarioId)?.t||''):('/ '+t.projectName)));
+  const rightBits = t.phase==='creator' || t.phase==='branch'
+    ? `<span class="pill">free plan</span><span class="pill">kw@chatcut</span>`
+    : `<button class="newbtn" data-action="newtab">+ New project</button><span class="pill">auto-saved</span><button class="newbtn" data-action="share">Share</button>`;
+  return `
+    <div class="top">
+      <div class="home" data-action="home"><span class="ic">⌂</span>Home</div>
+      <span class="crumb">${crumb}</span>
+      <span class="sp"></span>
+      ${rightBits}
+    </div>`;
+}
+
+function renderIntentGrid(t){
+  return `
+    <div class="qprompt">Hi. What do you want to do?</div>
+    <div class="intents">
+      ${SCENARIOS.map(s=>`
+        <div class="intent" data-scenario="${s.id}">
+          ${s.pro?'<span class="pro">PRO</span>':''}
+          <span class="t">${s.t}${s.newly?' <sup class="newly">NEW</sup>':''}</span>
+          <span class="d">${s.d}</span>
+        </div>`).join('')}
+    </div>
+    <div class="skip" data-action="skip">Skip intro → blank project</div>
+  `;
+}
+
+function renderBranchBody(t){
+  const s = SCENARIOS.find(x=>x.id===t.scenarioId);
+  const copy = BRANCH_COPY[t.scenarioId];
+
+  let body = '';
+  if(t.scenarioId==='talking-head'){
+    const chips = [
+      {id:'filler',name:'Remove filler words'},
+      {id:'repeat',name:'Remove repeat takes'},
+      {id:'pauses',name:'Tighten pauses'},
+      {id:'captions',name:'+ captions'},
+      {id:'vertical',name:'Vertical crop'},
+      {id:'highlight',name:'Auto-highlight'},
+    ];
+    body = `
+      <div class="lbl">footage</div>
+      <div class="drop ${t.sourceAttached?'has':''}" data-action="attach">${t.sourceAttached?'✓ interview-final.mp4 · 08:42':'drop .mp4 / .mov / .mp3 — or paste URL'}</div>
+      <div class="lbl">common requirements</div>
+      <div class="chips" id="branch-chips">
+        ${chips.map(c=>`<span class="c ${t.selectedChips[c.id]?'on':''}" data-chip="${c.id}">${c.name}</span>`).join('')}
+      </div>
+    `;
+  }
+  else if(t.scenarioId==='motion-graphics'){
+    body = `
+      <div class="lbl">pick a template (or make your own)</div>
+      <div class="presets">
+        ${PRESETS['motion-graphics'].map(p=>`
+          <div class="preset ${p.dash?'dash':''} ${t.selectedPreset===p.id?'on':''}" data-preset="${p.id}" ${p.cls?`style="background:var(--acc);background-image:linear-gradient(135deg,${pickGrad(p.cls)[0]},${pickGrad(p.cls)[1]});"`:''}>
+            <span class="b">${p.name}</span>
+          </div>`).join('')}
+      </div>
+    `;
+  }
+  else if(t.scenarioId==='url-to-ads'){
+    body = `
+      <div class="lbl">product URL</div>
+      <div class="fld" contenteditable="true" data-field="url">https://rallyenergy.com/pineapple-mint</div>
+      <div class="lbl">or drop product images + info</div>
+      <div class="drop" data-action="attach">drop images — we'll extract copy &amp; style</div>
+      <div class="lbl">ad format</div>
+      <div class="presets">
+        ${PRESETS['url-to-ads'].map(p=>`
+          <div class="preset ${p.dash?'dash':''} ${t.selectedPreset===p.id?'on':''}" data-preset="${p.id}" ${p.cls?`style="background-image:linear-gradient(160deg,${pickGrad(p.cls)[0]},${pickGrad(p.cls)[1]});"`:''}>
+            <span class="b">${p.name}</span>
+          </div>`).join('')}
+      </div>
+    `;
+  }
+  else if(t.scenarioId==='video-gen'){
+    body = `
+      <div class="lbl">model (free · or upgrade for Seedance 2.0)</div>
+      <div class="chips" id="model-chips">
+        <span class="c ${t.selectedChips['veo']?'on':'on'}" data-chip="veo" data-group="model">Veo 2</span>
+        <span class="c ${t.selectedChips['kling']?'on':''}" data-chip="kling" data-group="model">Kling 1.6</span>
+        <span class="c pro-chip" data-chip="seedance" data-pro="1">⚡ Seedance 2.0 <span class="tag">PRO</span></span>
+      </div>
+      <div class="lbl">preset style</div>
+      <div class="presets">
+        ${PRESETS['video-gen'].map(p=>`
+          <div class="preset ${t.selectedPreset===p.id?'on':''}" data-preset="${p.id}" style="background-image:linear-gradient(160deg,${pickGrad(p.cls)[0]},${pickGrad(p.cls)[1]});">
+            <span class="b">${p.name}</span>
+          </div>`).join('')}
+      </div>
+    `;
+  }
+  else if(t.scenarioId==='voiceover'){
+    body = `
+      <div class="lbl">voice</div>
+      <div class="chips">
+        <span class="c ${t.selectedChips['v1']?'on':'on'}" data-chip="v1">Warm male · US</span>
+        <span class="c ${t.selectedChips['v2']?'on':''}" data-chip="v2">Warm female · US</span>
+        <span class="c ${t.selectedChips['v3']?'on':''}" data-chip="v3">British · doc</span>
+        <span class="c ${t.selectedChips['v4']?'on':''}" data-chip="v4">+ clone yours</span>
+      </div>
+    `;
+  }
+  else if(t.scenarioId==='music-gen'){
+    body = `
+      <div class="lbl">reference track (optional)</div>
+      <div class="drop" data-action="attach">drop .mp3 / paste Spotify link</div>
+      <div class="lbl">use case</div>
+      <div class="chips">
+        ${[['bed','Bed under VO'],['sting','Sting'],['intro','Intro theme'],['bg','Background loop']].map(([id,n],i)=>
+          `<span class="c ${t.selectedChips[id]||(i===0&&!Object.keys(t.selectedChips).length)?'on':''}" data-chip="${id}">${n}</span>`
+        ).join('')}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="back" data-action="back">← back to scenarios</div>
+    <div class="sub">${copy.hello}</div>
+    ${body}
+    <div class="lbl">${t.scenarioId==='voiceover'?'script':(t.scenarioId==='music-gen'?'describe':('or describe what you want'))}</div>
+    <div class="fld area" contenteditable="true" data-field="prompt" data-placeholder="${copy.placeholder}">${escapeHtml(t.promptText) || `<span style="color:#999">${copy.placeholder}</span>`}</div>
+    <div class="go" data-action="create">${s.pro?'Generate ▶ (PRO)':'Create project ▶'}</div>
+  `;
+}
+
+function pickGrad(cls){
+  const m = {
+    'th-head':['#5a4a3a','#9a7a5a'],'th-ugc':['#1a3a5a','#4a6aa0'],
+    'th-ai':['#3a2a5a','#7a5aa0'],'th-mg':['#3a5a2a','#6a9a5a'],
+    'th-vo':['#5a3a3a','#9a6a6a'],'th-pod':['#2a3a4a','#5a6a8a'],
+    'th-mus':['#4a3a5a','#8a6aaa'],'th-int':['#4a2a3a','#8a5a6a'],
+    'th-prm':['#3a4a3a','#7a8a6a']
+  };
+  return m[cls] || ['#555','#888'];
+}
+
+function renderGallery(){
+  const isFirst = state.startState==='first';
+  const defaultTab = state.galleryTab || 'Recent';
+  const tabs = ['Recent','Your projects','Brand kits'];
+  const tabsHtml = tabs.map(n=>`<div class="${n===defaultTab?'on':''}" data-gtab="${n}">${n}</div>`).join('');
+
+  let body = '';
+  if(defaultTab==='Recent' && isFirst){
+    body = `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 20px;text-align:center;color:#666;">
+        <div style="font-family:'Caveat',cursive;font-size:32px;color:#999;line-height:1;">∅</div>
+        <div style="font-family:'Caveat',cursive;font-size:22px;color:#444;">No projects yet</div>
+        <div style="font-size:13px;max-width:260px;line-height:1.4;">Pick a scenario on the left to create your first project. It'll show up here, along with everything else you make.</div>
+      </div>
+    `;
+  } else if(defaultTab==='Recent'){
+    body = `
+      <div class="gsec">Today</div>
+      <div class="grid3">
+        ${tileHtml({kind:'head',kl:'EDIT',name:'Founder interview · 60s',dur:'0:58',meta:'active · 2m ago'})}
+        ${tileHtml({kind:'vo',kl:'GEN',name:'Script · launch VO',dur:'0:24',meta:'12m ago'})}
+        ${tileHtml({kind:'mg',kl:'TMPL',name:'Intro stinger',dur:'0:03',meta:'1h ago · draft'})}
+      </div>
+      <div class="gsec">Yesterday</div>
+      <div class="grid3">
+        ${tileHtml({kind:'pod',kl:'EDIT',name:'Podcast ep 14',dur:'1:12',meta:'exported'})}
+        ${tileHtml({kind:'ugc',kl:'EDIT',name:'UGC — Rally',dur:'0:15',meta:'shared'})}
+        ${tileHtml({kind:'ai',kl:'GEN',name:'Sizzle open',dur:'0:08',meta:'draft'})}
+      </div>
+    `;
+  } else if(defaultTab==='Your projects' && isFirst){
+    body = `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 20px;text-align:center;color:#666;">
+        <div style="font-family:'Caveat',cursive;font-size:22px;color:#444;">Nothing here yet</div>
+        <div style="font-size:13px;max-width:260px;line-height:1.4;">Your projects will appear here once you've made one.</div>
+      </div>
+    `;
+  } else if(defaultTab==='Your projects'){
+    body = `
+      <div class="chips" style="margin-bottom:4px;"><span class="c on">All · 8</span><span class="c">Drafts · 3</span><span class="c">Exported · 4</span><span class="c">Shared · 1</span></div>
+      <div class="grid4">
+        ${tileHtml({kind:'head',kl:'EDIT',name:'Founder interview',dur:'0:58',meta:'today'})}
+        ${tileHtml({kind:'pod',kl:'EDIT',name:'Podcast ep 14',dur:'1:12',meta:'today'})}
+        ${tileHtml({kind:'ugc',kl:'EDIT',name:'UGC — Rally',dur:'0:15',meta:'yesterday'})}
+        ${tileHtml({kind:'mg',kl:'TMPL',name:'Lower-third',dur:'—',meta:'yesterday'})}
+        ${tileHtml({kind:'ai',kl:'GEN',name:'Sizzle open',dur:'0:08',meta:'mon'})}
+        ${tileHtml({kind:'int',kl:'EDIT',name:'Interview · Martha',dur:'2:04',meta:'mon'})}
+        ${tileHtml({kind:'vo',kl:'GEN',name:'VO · launch',dur:'0:24',meta:'sun'})}
+        ${tileHtml({kind:'mus',kl:'GEN',name:'Music theme',dur:'0:20',meta:'sun'})}
+      </div>
+    `;
+  } else {
+    if(isFirst){
+      body = `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 20px;text-align:center;color:#666;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#444;">No brand assets yet</div>
+          <div style="font-size:13px;max-width:280px;line-height:1.4;">Upload a logo, font, or music loop and we'll weave it into every project automatically.</div>
+          <button class="newbtn" style="margin-top:4px;" data-action="upload-brand">+ upload asset</button>
+        </div>
+      `;
+    } else {
+    body = `
+      <div style="font-family:Caveat,cursive;font-size:14px;color:#444;">Reusable primitives for your team · drop into any project.</div>
+      <div class="grid4">
+        <div class="tile"><div class="thumb" style="background:#fff;aspect-ratio:16/9;"><span style="font-family:Caveat,cursive;font-size:17px;">Rally / Logo</span></div><div class="body"><b>Logo · Rally</b><span class="m">3 variants</span></div></div>
+        <div class="tile"><div class="thumb" style="background:linear-gradient(180deg,#222,#555);color:#fff;font-family:Caveat,cursive;font-size:17px;aspect-ratio:16/9;">Lower-third</div><div class="body"><b>Lower-third pack</b><span class="m">6 styles</span></div></div>
+        <div class="tile"><div class="thumb" style="background:#eadfcb;font-family:Caveat,cursive;font-size:20px;aspect-ratio:16/9;">Aa</div><div class="body"><b>Brand fonts</b><span class="m">Caveat · Kalam</span></div></div>
+        <div class="tile em"><div class="thumb"><span style="font-family:Caveat,cursive;font-size:15px;color:#666;">+ upload</span></div><div class="body"><b>New asset</b><span class="m">logo, font, loop…</span></div></div>
+      </div>
+    `;
+    }
+  }
+
+  return `
+    <div class="gal">
+      <div class="gtop"><div class="gtabs">${tabsHtml}</div><div class="search">⌕ search</div></div>
+      ${body}
+    </div>
+  `;
+}
+
+function tileHtml(e){
+  return `<div class="tile" data-example="${e.name}"><div class="thumb th-${e.kind}"><span class="kind">${e.kl}</span><span class="play">▶</span><span class="dur">${e.dur}</span></div><div class="body"><b>${e.name}</b><span class="m">${e.meta}</span></div></div>`;
+}
+
+// ── PROJECT surface
+function renderProject(t){
+  return `
+    ${renderTopBar(t)}
+    <div class="p-body">
+      <div class="chat">${renderChat(t)}</div>
+      <div class="art">${renderArtifact(t)}</div>
+    </div>
+  `;
+}
+
+function renderChat(t){
+  const s = SCENARIOS.find(x=>x.id===t.scenarioId);
+  const msgs = [];
+  msgs.push(`<div class="bub me"><span class="nm">YOU</span>${escapeHtml(t.promptText || 'cut my interview to 60s, remove ums')}</div>`);
+  if(t.phase==='reveal'){
+    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Got it. I turned that into a structured prompt — review &amp; run, or tweak it.</div>`);
+  } else if(t.phase==='running'){
+    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Running…</div>`);
+  } else if(t.phase==='post'){
+    msgs.push(`<div class="bub ai"><span class="nm">CHATCUT</span>Done — ${scenarioOutputLabel(t.scenarioId)}. Play, export, or ask for a change.</div>`);
+  }
+  return `
+    <div class="msgs">${msgs.join('')}</div>
+    <div class="comp">
+      ${t.phase==='post'?`<div class="cc">
+        ${(scenarioRefineChips(t.scenarioId)).map(c=>`<span class="c" data-refine="${c}">${c}</span>`).join('')}
+      </div>`:''}
+      <div class="r"><div class="f" contenteditable="true" data-field="chat">${t.phase==='post'?'refine or ask a question…':'ask or refine…'}</div><div class="send" data-action="chatsend">⏎</div></div>
+    </div>
+  `;
+}
+
+function scenarioOutputLabel(id){
+  return {'talking-head':'cut v1 is 0:58','motion-graphics':'stinger is 3s','url-to-ads':'UGC ad is 0:15','video-gen':'AI clip is 0:08','voiceover':'VO is 0:24','music-gen':'music bed is 0:45'}[id] || 'output ready';
+}
+function scenarioRefineChips(id){
+  return {
+    'talking-head':['+ captions','vertical crop','make 30s','open timeline'],
+    'motion-graphics':['change colors','slower','add logo','loop'],
+    'url-to-ads':['different hook','add price','change voice','15 → 30s'],
+    'video-gen':['longer','wider angle','different style','upscale'],
+    'voiceover':['more energy','slower','different voice','add pauses'],
+    'music-gen':['bigger build','remove drums','extend to 60s','different key'],
+  }[id] || ['refine','regenerate'];
+}
+
+function renderArtifact(t){
+  if(t.phase==='reveal') return renderRevealArtifact(t);
+  if(t.phase==='running') return `<div class="running-art"><div class="spinner"></div><div class="lbl">Running your plan…</div><div class="sub">transcribing · picking moments · rendering</div></div>`;
+  if(t.phase==='post') return renderPostArtifact(t);
+  return '';
+}
+
+function renderRevealArtifact(t){
+  const prompt = composePrompt(t);
+  return `
+    <div class="ac blue">
+      <div class="h"><span class="t">✨ prompt · v1</span><span class="m">AI-composed · editable</span></div>
+      <div style="font-size:12px;color:#555;line-height:1.4;margin-bottom:6px;">Your messy input became a structured prompt. Edit any line or hit Run.</div>
+      <div class="promptbox">${prompt}</div>
+      <div class="row">
+        <button class="btn" data-action="edit-prompt">✎ Edit</button>
+        <button class="btn p ml" data-action="run">Run plan ▶</button>
+      </div>
+    </div>
+    ${t.scenarioId==='talking-head'||t.scenarioId==='motion-graphics'||t.scenarioId==='url-to-ads'?`
+    <div class="ac">
+      <div class="h"><span class="t">⤓ source</span><span class="m">${sourceLabel(t.scenarioId)}</span></div>
+      <div class="ph">footage thumbnail · scrub →</div>
+    </div>`:''}
+  `;
+}
+
+function sourceLabel(id){
+  return {'talking-head':'interview-final.mp4 · 08:42','motion-graphics':'your brand kit + logo.svg','url-to-ads':'rallyenergy.com · 4 images'}[id] || '';
+}
+
+function composePrompt(t){
+  const s = SCENARIOS.find(x=>x.id===t.scenarioId);
+  if(t.scenarioId==='talking-head'){
+    const ops = [];
+    if(t.selectedChips.filler) ops.push("strip fillers [um, uh, y'know]");
+    if(t.selectedChips.repeat) ops.push('drop repeat takes');
+    if(t.selectedChips.pauses) ops.push('tighten pauses > 0.6s');
+    if(t.selectedChips.captions) ops.push('burn captions');
+    if(t.selectedChips.vertical) ops.push('vertical 9:16 crop');
+    if(t.selectedChips.highlight) ops.push('rank by signal · pick top 3');
+    if(!ops.length) ops.push('transcribe & cue');
+    return `<span class="k">intent:</span>  edit talking-head
+<span class="k">source:</span>  interview-final.mp4 (08:42)
+<span class="k">target:</span>  00:60 ± 3s
+<span class="k">ops:</span>     ${ops.join(', ')}
+<span class="k">output:</span>  MP4 · 1080p · original audio`;
+  }
+  if(t.scenarioId==='motion-graphics'){
+    return `<span class="k">intent:</span>  motion graphics · ${t.selectedPreset||'lower-third'}
+<span class="k">brand:</span>   your kit (logo.svg, Caveat/Kalam)
+<span class="k">duration:</span>  3s
+<span class="k">style:</span>   clean slide-in, ease-out
+<span class="k">output:</span>  MOV · transparent · 1080p`;
+  }
+  if(t.scenarioId==='url-to-ads'){
+    return `<span class="k">intent:</span>  UGC ad · ${t.selectedPreset||'problem/sol'}
+<span class="k">source:</span>  rallyenergy.com/pineapple-mint
+<span class="k">format:</span>  IG vertical · 15s
+<span class="k">hook:</span>    "the energy drink that doesn't wreck your afternoon"
+<span class="k">output:</span>  MP4 · 9:16 · subtitles burned`;
+  }
+  if(t.scenarioId==='video-gen'){
+    const model = t.selectedChips.kling?'Kling 1.6':(t.selectedChips.seedance?'Seedance 2.0':'Veo 2');
+    return `<span class="k">intent:</span>  generate video
+<span class="k">model:</span>   ${model}
+<span class="k">style:</span>   ${t.selectedPreset||'cinematic'}
+<span class="k">prompt:</span>  ${escapeHtml(t.promptText || BRANCH_COPY['video-gen'].placeholder).slice(0,80)}…
+<span class="k">duration:</span>  8s · 1080p · 24fps`;
+  }
+  if(t.scenarioId==='voiceover'){
+    return `<span class="k">intent:</span>  generate voiceover
+<span class="k">voice:</span>   Warm male · US
+<span class="k">script:</span>  ${escapeHtml((t.promptText||BRANCH_COPY.voiceover.placeholder)).slice(0,80)}…
+<span class="k">pace:</span>    natural · 160wpm
+<span class="k">output:</span>  WAV · 48kHz mono`;
+  }
+  if(t.scenarioId==='music-gen'){
+    return `<span class="k">intent:</span>  generate music
+<span class="k">use:</span>     bed under VO
+<span class="k">brief:</span>   ${escapeHtml((t.promptText||BRANCH_COPY['music-gen'].placeholder)).slice(0,80)}…
+<span class="k">duration:</span>  45s · builds at 0:20
+<span class="k">output:</span>  MP3 · stereo · royalty-free`;
+  }
+  return '';
+}
+
+function renderPostArtifact(t){
+  return `
+    <div class="ac acc">
+      <div class="h"><span class="t">▶ ${scenarioOutputTitle(t.scenarioId)}</span><span class="m">pinned · ready</span></div>
+      <div class="plyr"><div class="ctrl">◀◀ ▶ ▶▶ 0:12 / ${scenarioDur(t.scenarioId)} ——●———————— ⟲ ⤢</div></div>
+      <div class="row">
+        <button class="btn">📝 transcript</button>
+        <button class="btn">▦ timeline</button>
+        <button class="btn">↗ share</button>
+        <button class="btn p ml" data-action="export">⤓ Export</button>
+      </div>
+    </div>
+  `;
+}
+function scenarioOutputTitle(id){
+  return {'talking-head':'cut v1 · 0:58','motion-graphics':'stinger v1 · 0:03','url-to-ads':'UGC ad v1 · 0:15','video-gen':'AI clip v1 · 0:08','voiceover':'VO v1 · 0:24','music-gen':'music bed v1 · 0:45'}[id] || 'output';
+}
+function scenarioDur(id){
+  return {'talking-head':'0:58','motion-graphics':'0:03','url-to-ads':'0:15','video-gen':'0:08','voiceover':'0:24','music-gen':'0:45'}[id] || '0:30';
+}
+
+// SHARED-LINK view
+function renderSharedLink(){
+  return `
+    <div class="ro-banner">
+      <span class="pill">READ-ONLY</span>
+      <span>Shared by <b>Kai</b> · Founder interview · 60s</span>
+      <span class="sp" style="flex:1;"></span>
+      <button class="newbtn" data-action="fork">↗ Fork to my projects</button>
+      <button class="newbtn" data-action="signin">⊕ Sign in</button>
+    </div>
+    <div class="p-body">
+      <div class="chat">
+        <div class="msgs">
+          <div class="bub ai"><span class="nm">CHATCUT</span>Here's <b>Founder interview · 60s</b>. Kai shared it with you.</div>
+          <div class="bub ai" style="opacity:.65;font-size:11px;">… chat history hidden · click Fork to continue the conversation</div>
+        </div>
+      </div>
+      <div class="art">
+        <div class="ac acc">
+          <div class="h"><span class="t">▶ cut v2 · 0:58</span><span class="m">pinned · exported</span></div>
+          <div class="plyr"><div class="ctrl">0:12 / 0:58 ——●———————————</div></div>
+          <div class="row">
+            <button class="btn" data-action="fork">↗ Fork</button>
+            <button class="btn">💬 Comment</button>
+            <button class="btn p ml">⤓ Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  renderFrame();
+}
+
+// ───────────────────────────────────────────────────────────────
+// INTERACTIONS
+// ───────────────────────────────────────────────────────────────
+document.addEventListener('click',e=>{
+  const t = curTab();
+
+  // dev state grp
+  const stateBtn = e.target.closest('#state-grp b');
+  if(stateBtn){
+    state.startState = stateBtn.dataset.state;
+    $$('#state-grp b').forEach(b=>b.classList.toggle('on', b===stateBtn));
+    reset();
+    return;
+  }
+  if(e.target.id==='reset'){ reset(); return; }
+
+  if(!t) return;
+
+  const act = e.target.closest('[data-action]')?.dataset.action;
+
+  // persona
+  const pchip = e.target.closest('[data-persona]');
+  if(pchip){ state.persona = pchip.dataset.persona; render(); return; }
+  if(act==='dismiss-persona'){ state.personaAnswered = true; render(); return; }
+
+  // scenario pick
+  const sc = e.target.closest('[data-scenario]');
+  if(sc){
+    t.scenarioId = sc.dataset.scenario;
+    t.phase = 'branch';
+    const s = SCENARIOS.find(x=>x.id===t.scenarioId);
+    t.title = s.t;
+    render();
+    return;
+  }
+
+  // skip / back
+  if(act==='skip'){ // blank project
+    t.scenarioId='talking-head'; // fall into a neutral branch; user types prompt
+    t.phase='branch';
+    t.title='Untitled project';
+    render();
+    return;
+  }
+  if(act==='back'){ t.scenarioId=null; t.phase='creator'; t.title='New project'; render(); return; }
+
+  // chips inside branch
+  const chip = e.target.closest('[data-chip]');
+  if(chip){
+    // pro gate for seedance
+    if(chip.dataset.pro){ openPremium(); return; }
+    const id = chip.dataset.chip;
+    const group = chip.dataset.group;
+    if(group==='model'){
+      ['veo','kling','seedance'].forEach(k=>delete t.selectedChips[k]);
+      t.selectedChips[id]=true;
+    } else {
+      t.selectedChips[id] = !t.selectedChips[id];
+    }
+    render();
+    return;
+  }
+  // presets
+  const pre = e.target.closest('[data-preset]');
+  if(pre){ t.selectedPreset = pre.dataset.preset; render(); return; }
+
+  // gallery tile → open as demo project
+  const tile = e.target.closest('[data-example]');
+  if(tile){
+    // Open a new tab that's already in post state, seeded from example
+    const name = tile.dataset.example;
+    const nt = Object.assign(freshCreatorTab(),{
+      title:name, phase:'post', scenarioId:'talking-head',
+      projectName:name, cutReady:true,
+      promptText:'example seeded — '+name
+    });
+    state.tabs.push(nt);
+    state.activeTabId = nt.id;
+    render();
+    return;
+  }
+
+  // gallery tab switch
+  const gt = e.target.closest('[data-gtab]');
+  if(gt){ state.galleryTab = gt.dataset.gtab; render(); return; }
+
+  // create project
+  if(act==='create'){
+    // capture prompt text from contenteditable
+    const pe = document.querySelector('[data-field="prompt"]');
+    if(pe) t.promptText = (pe.innerText||'').trim();
+    if(!t.promptText) t.promptText = BRANCH_COPY[t.scenarioId].placeholder;
+    t.phase = 'reveal';
+    t.projectName = synthesizeProjectName(t);
+    t.title = t.projectName;
+    render();
+    return;
+  }
+
+  // run
+  if(act==='run'){
+    t.phase = 'running';
+    render();
+    setTimeout(()=>{ t.phase='post'; t.cutReady=true; render(); }, 2200);
+    return;
+  }
+
+  if(act==='export'){
+    // no-op per scope
+    flash('Export is stubbed — would download now.');
+    return;
+  }
+  if(act==='edit-prompt'){ flash('Inline editing — scope stub. Every line is editable in the real build.'); return; }
+  if(act==='home'){
+    // Replace current view with fresh creator; zero-sync keeps prior project safe in Recent
+    const cur = curTab();
+    if(cur) { cur.phase='creator'; cur.scenarioId=null; cur.title='New project'; cur.selectedChips={}; cur.selectedPreset=null; cur.promptText=''; cur.sourceAttached=false; cur.cutReady=false; }
+    render();
+    return;
+  }
+  if(act==='newtab'){
+    const cur = curTab();
+    if(cur) { cur.phase='creator'; cur.scenarioId=null; cur.title='New project'; cur.selectedChips={}; cur.selectedPreset=null; cur.promptText=''; cur.sourceAttached=false; cur.cutReady=false; }
+    render();
+    return;
+  }
+  if(act==='fork'){ flash('Fork → creates a copy in YOUR projects. You become a user.'); return; }
+  if(act==='signin'){ flash('Sign-in → existing Better-Auth. Then fork.'); return; }
+  if(act==='share'){ flash('Share → generates read-only link (see "shared-link" state above).'); return; }
+
+  const refine = e.target.closest('[data-refine]');
+  if(refine){ flash('"'+refine.dataset.refine+'" — would spawn a refinement turn.'); return; }
+
+  const chatsend = e.target.closest('[data-action="chatsend"]');
+  if(chatsend){ flash('Chat send — would add a new turn + artifact version.'); return; }
+});
+
+// capture contenteditable prompts
+document.addEventListener('input', e=>{
+  const t = curTab(); if(!t) return;
+  if(e.target.dataset.field==='prompt') t.promptText = e.target.innerText;
+  if(e.target.dataset.field==='chat') t._chatDraft = e.target.innerText;
+});
+
+function addTab(){
+  const nt = freshCreatorTab();
+  state.tabs.push(nt);
+  state.activeTabId = nt.id;
+  render();
+}
+function closeTab(id){
+  const idx = state.tabs.findIndex(t=>t.id===id);
+  if(idx<0) return;
+  state.tabs.splice(idx,1);
+  if(state.activeTabId===id) state.activeTabId = (state.tabs[idx-1]||state.tabs[0]).id;
+  if(!state.tabs.length) state.tabs.push(freshCreatorTab()), state.activeTabId=state.tabs[0].id;
+  render();
+}
+function openPremium(){ $('#premium-modal').classList.add('on'); }
+function closePremium(){ $('#premium-modal').classList.remove('on'); }
+$('#pm-other').onclick = ()=>{ closePremium(); };
+$('#pm-upgrade').onclick = ()=>{ closePremium(); flash('Upgrade flow — would open pricing dialog.'); };
+
+function synthesizeProjectName(t){
+  const s = SCENARIOS.find(x=>x.id===t.scenarioId);
+  const txt = (t.promptText||'').split(/[,.]/)[0].trim().slice(0,42);
+  return (txt || s?.t || 'Project').replace(/\s+/g,' ');
+}
+
+function flash(msg){
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 14px;font-family:Kalam,cursive;font-size:13px;border-radius:3px;z-index:100;box-shadow:3px 3px 0 rgba(0,0,0,.3);';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2500);
+}
+
+// ── tweaks
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "startState": "first",
+  "persona": "Creator",
+  "showPersona": true,
+  "compact": false
+}/*EDITMODE-END*/;
+Object.assign(state, TWEAK_DEFAULTS);
+
+const twEl=$('#tw');
+const twP=$('#tw-persona'),twSP=$('#tw-showpersona'),twC=$('#tw-compact'),twJ=$('#tw-jump');
+twP.value=state.persona; twSP.checked=state.showPersona; twC.checked=state.compact;
+twP.addEventListener('change',()=>{state.persona=twP.value;persist('persona');render();});
+twSP.addEventListener('change',()=>{state.showPersona=twSP.checked;persist('showPersona');render();});
+twC.addEventListener('change',()=>{state.compact=twC.checked;document.body.classList.toggle('compact',twC.checked);persist('compact');});
+twJ.addEventListener('change',()=>{
+  const v = twJ.value; if(!v) return;
+  const t = curTab();
+  if(v==='creator'){ t.phase='creator'; t.scenarioId=null; t.title='New project'; }
+  else if(v.startsWith('branch:')){ t.phase='branch'; t.scenarioId=v.split(':')[1]; t.title=SCENARIOS.find(s=>s.id===t.scenarioId).t; }
+  else if(v==='reveal'){ t.phase='reveal'; t.scenarioId=t.scenarioId||'talking-head'; t.promptText=t.promptText||'cut my interview to 60s, remove ums'; t.title=synthesizeProjectName(t); }
+  else if(v==='running'){ t.phase='running'; t.scenarioId=t.scenarioId||'talking-head'; }
+  else if(v==='post'){ t.phase='post'; t.scenarioId=t.scenarioId||'talking-head'; t.cutReady=true; }
+  render();
+  twJ.value='';
+});
+function persist(k){
+  try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{[k]:state[k]}},'*');}catch(e){}
+}
+window.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.type==='__activate_edit_mode') twEl.classList.add('on');
+  else if(d.type==='__deactivate_edit_mode') twEl.classList.remove('on');
+});
+try{window.parent.postMessage({type:'__edit_mode_available'},'*');}catch(e){}
+
+// ── util
+function $$(s){return [...document.querySelectorAll(s)];}
+function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// ── BOOT
+reset();
+</script>
+</body>
+</html>
