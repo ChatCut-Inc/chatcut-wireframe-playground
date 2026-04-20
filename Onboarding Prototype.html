@@ -244,11 +244,31 @@ body.immersive #exit-immersive{display:block;}
 .panel-tabs .tab.on{border:1.5px solid var(--ink);border-bottom:2px solid var(--paper);color:var(--ink);background:var(--paper);position:relative;bottom:-1.5px;font-weight:700;}
 .panel-tab-right{margin-left:auto;display:flex;align-items:center;gap:8px;align-self:center;position:relative;}
 .tab-body{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper);}
-.tab-body.media{padding:12px 14px;gap:8px;overflow-y:auto;}
-.media-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.2px solid var(--ink);background:#fff;}
-.media-item .media-ic{font-size:16px;}
-.media-item b{font-family:'Kalam',cursive;font-size:13px;display:block;}
+.tab-body.media{padding:0;gap:0;flex-direction:row;overflow:hidden;}
+.media-list{flex:0 0 42%;min-width:200px;overflow-y:auto;padding:8px 6px;border-right:1.2px solid var(--ink);display:flex;flex-direction:column;gap:2px;background:var(--paper);}
+.media-item{display:flex;align-items:center;gap:10px;padding:6px 9px;cursor:pointer;border:1.2px solid transparent;user-select:none;}
+.media-item:hover{background:rgba(0,0,0,.03);}
+.media-item.on{background:var(--ink);color:#fff;}
+.media-item.on .meta{color:rgba(255,255,255,.7);}
+.media-item .media-ic{font-size:15px;flex-shrink:0;}
+.media-item b{font-family:'Kalam',cursive;font-size:13px;display:block;font-weight:600;}
 .media-item .meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#777;display:block;margin-top:1px;letter-spacing:.02em;}
+.media-preview{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;padding:14px;overflow-y:auto;}
+.mp-viewer{aspect-ratio:16/9;background:#1a1a1a;color:#fff;position:relative;border:1.2px solid var(--ink);display:flex;align-items:center;justify-content:center;}
+.mp-viewer::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:20px solid #fff;border-top:13px solid transparent;border-bottom:13px solid transparent;opacity:.9;}
+.mp-viewer.img{background:var(--warm);color:#888;font-family:'Kalam',cursive;font-size:12px;}
+.mp-viewer.img::before{display:none;}
+.mp-ctrl{position:absolute;bottom:0;left:0;right:0;height:22px;background:#111;border-top:1px solid #333;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:10px;color:#aaa;font-family:'IBM Plex Mono',monospace;}
+.mp-ctrl .sc{flex:1;height:2px;background:#333;position:relative;}
+.mp-ctrl .sc::after{content:"";position:absolute;left:0;top:0;height:100%;width:28%;background:var(--acc);}
+.mp-meta{font-family:'Kalam',cursive;}
+.mp-meta .nm{font-size:14px;font-weight:700;display:block;}
+.mp-meta .sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#777;letter-spacing:.04em;margin-top:3px;display:block;}
+.mp-transcript{border-top:1.2px solid var(--faint);padding-top:10px;margin-top:2px;display:flex;flex-direction:column;gap:5px;}
+.mp-transcript .hd{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;}
+.mp-transcript .ln{font-family:'Kalam',cursive;font-size:12.5px;line-height:1.5;color:#333;display:flex;gap:8px;}
+.mp-transcript .ln .ts{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#888;flex-shrink:0;padding-top:2px;}
+.mp-empty{padding:24px;text-align:center;font-family:'Kalam',cursive;color:#888;font-size:13px;}
 .drop-hint{border:1.5px dashed var(--faint);padding:16px;text-align:center;font-family:'Kalam',cursive;font-size:12px;color:#888;margin-top:4px;}
 .ac{border:1.2px solid var(--ink);background:#fff;padding:10px;box-shadow:3px 3px 0 var(--ink);}
 .ac.blue{border-color:var(--acc2);box-shadow:3px 3px 0 var(--acc2);}
@@ -290,14 +310,32 @@ body.immersive #exit-immersive{display:block;}
 .tl{flex:1 1 50%;min-height:0;border-top:1.2px solid var(--ink);background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(0,0,0,.04) 8px 9px);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#888;letter-spacing:.08em;text-transform:uppercase;}
 
 /* transcript tab wireframe */
-.tr-scroll{overflow-y:auto;background:var(--paper);}
+.tr-scroll{flex:1;min-height:0;overflow-y:auto;background:var(--paper);}
 .tr-pad{padding:18px 22px 32px;display:flex;flex-direction:column;gap:16px;max-width:720px;margin:0 auto;}
-.tr-line{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:4px 6px;border-left:2px solid transparent;}
-.tr-line:hover{border-left-color:var(--acc);background:rgba(0,0,0,.02);}
+.tr-line{display:flex;flex-direction:column;gap:4px;padding:4px 6px;}
+.tr-text[contenteditable]{outline:none;min-height:1.5em;caret-color:var(--ink);}
+.tr-text[contenteditable]:focus{outline:none;}
 .tr-meta{display:flex;align-items:baseline;gap:10px;}
 .tr-sp{font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:var(--ink);}
 .tr-ts{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#888;letter-spacing:.04em;}
 .tr-text{font-family:'Kalam',cursive;font-size:14px;line-height:1.55;color:#222;}
+.tr-text del{position:relative;color:#a69f94;text-decoration:line-through;text-decoration-color:#c3483a;text-decoration-thickness:1.5px;text-decoration-skip-ink:none;background:rgba(195,72,58,.05);cursor:pointer;transition:color .18s ease,background .18s ease,text-decoration-color .18s ease;}
+.tr-text del:hover{color:#6b6459;background:rgba(195,72,58,.02);}
+.tr-text del::after{content:"↺ restore";position:absolute;left:50%;bottom:100%;transform:translate(-50%,4px);margin-bottom:3px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fdfcf7;background:var(--ink);border:1px solid var(--ink);box-shadow:1.5px 1.5px 0 rgba(0,0,0,.15);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease;z-index:5;}
+.tr-text del:hover::after{opacity:1;transform:translate(-50%,0);}
+@keyframes tr-restore-flash{0%{background:rgba(76,128,98,.22);}100%{background:transparent;}}
+.tr-text .tr-restored{animation:tr-restore-flash .5s ease-out;border-radius:2px;}
+
+/* transcript toolbar — bleeds from the active tab, holds text-editing tools */
+.tr-toolbar{display:flex;align-items:center;gap:6px;padding:5px 14px;background:var(--paper);border-bottom:1.2px solid var(--ink);flex-shrink:0;min-height:34px;}
+.tr-toolbar .tr-tool{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;padding:0 7px;border:1.2px solid var(--ink);background:#fff;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;box-shadow:1.5px 1.5px 0 var(--ink);line-height:1;user-select:none;}
+.tr-toolbar .tr-tool:hover{background:var(--warm);}
+.tr-toolbar .tr-tool:active,.tr-toolbar .tr-tool.on{transform:translate(1.5px,1.5px);box-shadow:none;background:var(--warm);}
+.tr-toolbar .tr-tool .ic-strike{display:inline-block;position:relative;padding:0 1px;}
+.tr-toolbar .tr-tool .ic-strike::after{content:"";position:absolute;left:-1px;right:-1px;top:50%;height:1.5px;background:var(--ink);}
+.tr-toolbar .tr-sep{width:1px;align-self:stretch;background:var(--faint);margin:3px 3px;}
+.tr-toolbar .tr-tool-right{margin-left:auto;}
+.tr-toolbar .tr-tool .ic-reset{display:block;}
 .ac .ph{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.08) 6px 7px),var(--warm);border:1.2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#555;padding:4px;height:70px;}
 
 /* running animation */
@@ -348,6 +386,7 @@ body.immersive #exit-immersive{display:block;}
     <b data-state="shared">shared-link</b>
   </span>
   <button class="x" id="reset">⟲ reset</button>
+  <button class="x" id="hotreload" title="Reload page, keep your place">↻ hot reload</button>
   <button class="x" id="immersive" title="Full-screen preview">⛶ immersive</button>
 </div>
 <div id="exit-immersive" title="Exit full-screen">✕</div>
@@ -1096,13 +1135,21 @@ function renderTranscriptTab(t){
     {sp:'Speaker 1', ts:'01:42', text:"These cars, they are so important uh, in your. These graphics can be so important when you are making a talking head informational video. And they are so hard to make. And it doesn't have to be the case anymore. And it doesn't have to be the case anymore."},
     {sp:'Speaker 1', ts:'02:04', text:"This video took me. The AI the a. The AI is this AI ah will be able to generate the entire. Check as AI will be chekhas AI ah will be able to help you visualize everything you're saying on screen very clearly."},
   ];
-  const body = lines.map(l=>`
+  const toolbar = `
+    <div class="tr-toolbar">
+      <button class="tr-tool tr-tool-right" data-action="tr-reset" title="Reset all transcript edits" onmousedown="event.preventDefault()"><svg class="ic-reset" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg></button>
+      <button class="tr-tool" data-action="tr-strike" title="Strikethrough  (⌘⇧X)" onmousedown="event.preventDefault()"><span class="ic-strike">S</span></button>
+    </div>`;
+  // t.trContent holds the editable HTML (with <del> tags, <div>/<br> line breaks, etc.)
+  // When absent, we seed from the combined source transcript.
+  const initialHtml = escapeHtml(lines.map(l=>l.text).join(' '));
+  const content = (t.trContent != null) ? t.trContent : initialHtml;
+  const body = `
     <div class="tr-line">
-      <div class="tr-meta"><span class="tr-sp">${escapeHtml(l.sp)}</span><span class="tr-ts">${l.ts}</span></div>
-      <div class="tr-text">${escapeHtml(l.text)}</div>
-    </div>
-  `).join('');
-  return `<div class="tab-body tr-scroll"><div class="tr-pad">${body}</div></div>`;
+      <div class="tr-meta"><span class="tr-sp">${escapeHtml(lines[0].sp)}</span><span class="tr-ts">${lines[0].ts}</span></div>
+      <div class="tr-text" contenteditable="true" data-field="transcript" spellcheck="false">${content}</div>
+    </div>`;
+  return `<div class="tab-body">${toolbar}<div class="tr-scroll"><div class="tr-pad">${body}</div></div></div>`;
 }
 
 function renderTimelineTab(t){
@@ -1111,24 +1158,60 @@ function renderTimelineTab(t){
 
 function renderMediaTab(t){
   const SOURCES = {
-    'talking-head': [{name:'interview-final.mp4', meta:'video · 08:42 · 1.2 GB', ic:'🎬'}],
-    'motion-graphics': [{name:'logo.svg', meta:'vector · brand kit', ic:'🖼️'},{name:'kit-colors.json', meta:'style tokens', ic:'🎨'}],
-    'url-to-ads': [{name:'rallyenergy.com', meta:'url · 4 images scraped', ic:'🔗'},{name:'hero-product.jpg', meta:'image · 680 KB', ic:'🖼️'}],
-    'voiceover': [{name:'script.txt', meta:'text · 430 words', ic:'📝'}],
+    'talking-head': [
+      {name:'interview-final.mp4', meta:'video · 08:42 · 1.2 GB', ic:'🎬', type:'video', duration:'08:42'},
+      {name:'b-roll-office.mp4', meta:'video · 02:14 · 380 MB', ic:'🎬', type:'video', duration:'02:14'},
+    ],
+    'motion-graphics': [
+      {name:'logo.svg', meta:'vector · brand kit', ic:'🖼️', type:'image'},
+      {name:'kit-colors.json', meta:'style tokens', ic:'🎨', type:'other'},
+    ],
+    'url-to-ads': [
+      {name:'rallyenergy.com', meta:'url · 4 images scraped', ic:'🔗', type:'other'},
+      {name:'hero-product.jpg', meta:'image · 680 KB', ic:'🖼️', type:'image'},
+    ],
+    'voiceover': [{name:'script.txt', meta:'text · 430 words', ic:'📝', type:'other'}],
     'video-gen': [],
     'music-gen': [],
   };
   const items = SOURCES[t.scenarioId] || [];
-  const itemsHtml = items.map(i=>`
-    <div class="media-item">
+  if(!items.length){
+    return `<div class="tab-body"><div class="mp-empty">no source files — everything here is AI-generated</div></div>`;
+  }
+  const selIdx = Math.min(Math.max(0, t.selectedMediaIdx || 0), items.length - 1);
+  const listHtml = items.map((i, idx)=>`
+    <div class="media-item${idx===selIdx?' on':''}" data-media-idx="${idx}">
       <span class="media-ic">${i.ic}</span>
       <div><b>${escapeHtml(i.name)}</b><span class="meta">${escapeHtml(i.meta)}</span></div>
     </div>
   `).join('');
-  const hint = items.length
-    ? `<div class="drop-hint">drop files to add, or let the AI pull them in</div>`
-    : `<div class="drop-hint">no source files — everything here is AI-generated</div>`;
-  return `<div class="tab-body media">${itemsHtml}${hint}</div>`;
+  return `<div class="tab-body media">
+    <div class="media-list">${listHtml}</div>
+    <div class="media-preview">${renderMediaPreview(items[selIdx])}</div>
+  </div>`;
+}
+
+function renderMediaPreview(item){
+  if(!item) return '';
+  const isVideo = item.type === 'video';
+  const viewer = isVideo
+    ? `<div class="mp-viewer">
+         <div class="mp-ctrl"><span>▶</span><span>00:00</span><span class="sc"></span><span>${escapeHtml(item.duration||'08:42')}</span></div>
+       </div>`
+    : `<div class="mp-viewer img">${escapeHtml(item.ic)} &nbsp; ${escapeHtml(item.name)}</div>`;
+  const meta = `
+    <div class="mp-meta">
+      <span class="nm">${escapeHtml(item.name)}</span>
+      <span class="sub">${escapeHtml(item.meta)}</span>
+    </div>`;
+  const transcript = isVideo ? `
+    <div class="mp-transcript">
+      <div class="hd">Transcript</div>
+      <div class="ln"><span class="ts">00:00</span><span>Today we're releasing a new version of the Checkout app.</span></div>
+      <div class="ln"><span class="ts">00:14</span><span>Number one, improvements in stability and performance.</span></div>
+      <div class="ln"><span class="ts">00:34</span><span>And secondly, we are introducing a complete new UI redesign.</span></div>
+    </div>` : '';
+  return viewer + meta + transcript;
 }
 
 function renderChat(t){
@@ -1319,6 +1402,26 @@ function renderSharedLink(){
 
 function render(){
   renderFrame();
+  persistState();
+}
+
+// sessionStorage persistence — lets "hot reload" / F5 keep the user on the current view.
+// Cleared when the tab closes (sessionStorage boundary), or by the dev "reset" button.
+const PERSIST_KEY = 'chatcut-onboarding-state-v1';
+function persistState(){
+  try{ sessionStorage.setItem(PERSIST_KEY, JSON.stringify(state)); }catch(e){}
+}
+function restoreState(){
+  try{
+    const raw = sessionStorage.getItem(PERSIST_KEY);
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    Object.keys(saved).forEach(k=>{ state[k] = saved[k]; });
+    return true;
+  }catch(e){ return false; }
+}
+function clearPersistedState(){
+  try{ sessionStorage.removeItem(PERSIST_KEY); }catch(e){}
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -1352,8 +1455,14 @@ document.addEventListener('click',e=>{
     return;
   }
   if(e.target.id==='reset'){
+    clearPersistedState();
     if(state.authStep){ render(); return; }
     reset();
+    return;
+  }
+  if(e.target.id==='hotreload'){
+    persistState();
+    location.reload();
     return;
   }
   if(e.target.id==='immersive'){
@@ -1526,6 +1635,28 @@ document.addEventListener('click',e=>{
   const rt = e.target.closest('[data-right-tab]');
   if(rt){ t.activeRightTab = rt.dataset.rightTab; render(); return; }
 
+  // media list pick
+  const mi = e.target.closest('[data-media-idx]');
+  if(mi){ t.selectedMediaIdx = Number(mi.dataset.mediaIdx); render(); return; }
+
+  // transcript toolbar: strikethrough / reset
+  if(act==='tr-strike'){ applyTranscriptStrike(t); return; }
+  if(act==='tr-reset'){ resetTranscriptEdits(t); return; }
+
+  // transcript: click a struck word to restore it (symmetric to striking)
+  const struckEl = e.target.closest('.tr-text del');
+  if(struckEl){
+    const editable = findTrText(struckEl);
+    if(editable){
+      const sel = window.getSelection();
+      const draggedSelection = sel && !sel.isCollapsed && sel.toString().length > 0 && editable.contains(sel.anchorNode);
+      if(!draggedSelection){
+        restoreTranscriptWord(struckEl, editable, t);
+        return;
+      }
+    }
+  }
+
   // left-panel tab switch (AI / Transcript)
   const lt = e.target.closest('[data-left-tab]');
   if(lt){ t.activeLeftTab = lt.dataset.leftTab; render(); return; }
@@ -1583,9 +1714,265 @@ document.addEventListener('click',e=>{
   if(chatsend){ flash('Chat send — would add a new turn + artifact version.'); return; }
 });
 
+// Unified whole-word expansion. Snaps the current selection to word bounds
+// within the transcript editable. Used by strike, copy, cut, paste.
+// - Non-collapsed selection: trims edges, expands to word bounds.
+// - Collapsed caret: expands to the word at caret (or in `direction` if given).
+// The editable div is source of truth; callers mirror innerHTML into t.trContent
+// so hot-reload and tab switches preserve edits.
+function expandSelectionToWords(direction){
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0) return null;
+  const range = sel.getRangeAt(0);
+  const editable = findTrText(range.startContainer);
+  if(!editable || !editable.contains(range.endContainer)) return null;
+  const fullText = editable.textContent || '';
+  let lo, hi;
+  if(range.collapsed){
+    const caret = plainTextOffset(editable, range.startContainer, range.startOffset);
+    const word = direction ? findWordForKey(fullText, caret, direction) : findWordAtCaret(fullText, caret);
+    if(!word) return null;
+    [lo, hi] = word;
+  } else {
+    const a = plainTextOffset(editable, range.startContainer, range.startOffset);
+    const b = plainTextOffset(editable, range.endContainer, range.endOffset);
+    lo = Math.min(a, b); hi = Math.max(a, b);
+    while(lo < hi && /\s/.test(fullText[lo])) lo++;
+    while(hi > lo && /\s/.test(fullText[hi-1])) hi--;
+    while(lo > 0 && !/\s/.test(fullText[lo-1])) lo--;
+    while(hi < fullText.length && !/\s/.test(fullText[hi])) hi++;
+  }
+  if(lo >= hi) return null;
+  setRangeToPlainOffsets(range, editable, lo, hi);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  return { editable, range };
+}
+
+function applyTranscriptStrike(t, direction){
+  const result = expandSelectionToWords(direction);
+  if(!result){
+    if(!direction) flash('Place cursor on a word.');
+    return null;
+  }
+  const { editable, range } = result;
+  const del = document.createElement('del');
+  try { range.surroundContents(del); }
+  catch(e){ del.appendChild(range.extractContents()); range.insertNode(del); }
+  window.getSelection().removeAllRanges();
+  t.trContent = editable.innerHTML;
+  persistState();
+  return del;
+}
+
+// Insert a node at the transcript split point, following the same word rules as strike.
+// - Selection: strike it first (word-snapped), then insert the node before the struck run.
+// - Collapsed caret strictly inside a word: insert at the start of that word.
+// - Caret on a boundary (or in whitespace): insert at the caret.
+// Used by Enter (inserts <br>) and paste (inserts a text node).
+function insertAtTranscriptSplitPoint(t, nodeToInsert){
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0) return false;
+  const range = sel.getRangeAt(0);
+  const editable = findTrText(range.startContainer);
+  if(!editable || !editable.contains(range.endContainer)) return false;
+
+  if(!range.collapsed){
+    const del = applyTranscriptStrike(t);
+    if(!del || !del.parentNode) return false;
+    del.parentNode.insertBefore(nodeToInsert, del);
+    t.trContent = editable.innerHTML;
+    persistState();
+    return true;
+  }
+
+  const fullText = editable.textContent || '';
+  let splitAt = plainTextOffset(editable, range.startContainer, range.startOffset);
+  const prevIsWord = splitAt > 0 && !/\s/.test(fullText[splitAt-1]);
+  const nextIsWord = splitAt < fullText.length && !/\s/.test(fullText[splitAt]);
+  if(prevIsWord && nextIsWord){
+    while(splitAt > 0 && !/\s/.test(fullText[splitAt-1])) splitAt--;
+  }
+  const pos = domPositionAtOffset(editable, splitAt);
+  if(!pos) return false;
+  const r = document.createRange();
+  r.setStart(pos.node, pos.offset);
+  r.collapse(true);
+  r.insertNode(nodeToInsert);
+  r.setStartAfter(nodeToInsert);
+  r.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(r);
+  t.trContent = editable.innerHTML;
+  persistState();
+  return true;
+}
+
+function applyTranscriptSplit(t){
+  return insertAtTranscriptSplitPoint(t, document.createElement('br'));
+}
+
+// Bidirectional: strike the word the caret is inside or adjacent to.
+function findWordAtCaret(text, caret){
+  const len = text.length;
+  const leftWord = caret > 0 && !/\s/.test(text[caret-1]);
+  const rightWord = caret < len && !/\s/.test(text[caret]);
+  if(!leftWord && !rightWord) return null;
+  let lo = caret, hi = caret;
+  while(lo > 0 && !/\s/.test(text[lo-1])) lo--;
+  while(hi < len && !/\s/.test(text[hi])) hi++;
+  return lo === hi ? null : [lo, hi];
+}
+
+// Directional: skip whitespace first, then return the full word we land in.
+function findWordForKey(text, caret, direction){
+  const len = text.length;
+  if(direction === 'backward'){
+    let pos = caret;
+    while(pos > 0 && /\s/.test(text[pos-1])) pos--;
+    if(pos === 0) return null;
+  } else {
+    var pos = caret;
+    while(pos < len && /\s/.test(text[pos])) pos++;
+    if(pos === len) return null;
+  }
+  let lo = pos, hi = pos;
+  while(lo > 0 && !/\s/.test(text[lo-1])) lo--;
+  while(hi < len && !/\s/.test(text[hi])) hi++;
+  return lo === hi ? null : [lo, hi];
+}
+
+// Plain-text offset of a DOM position within `root` (counts only visible text).
+function plainTextOffset(root, node, offset){
+  const r = document.createRange();
+  r.selectNodeContents(root);
+  try { r.setEnd(node, offset); } catch(e){ return 0; }
+  return r.toString().length;
+}
+
+// Map a pair of plain-text offsets back to DOM and set range start/end.
+function setRangeToPlainOffsets(range, root, startOff, endOff){
+  const s = domPositionAtOffset(root, startOff);
+  const e = domPositionAtOffset(root, endOff);
+  if(!s || !e) return;
+  range.setStart(s.node, s.offset);
+  range.setEnd(e.node, e.offset);
+}
+function domPositionAtOffset(root, textOffset){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  let pos = 0, node;
+  while((node = walker.nextNode())){
+    const len = node.data.length;
+    if(textOffset <= pos + len) return { node, offset: textOffset - pos };
+    pos += len;
+  }
+  if(node) return { node, offset: node.data.length };
+  return { node: root, offset: 0 };
+}
+// Restore — unwrap a single <del>, flash the word briefly, persist.
+function restoreTranscriptWord(del, editable, t){
+  const parent = del.parentNode;
+  if(!parent) return;
+  const span = document.createElement('span');
+  span.className = 'tr-restored';
+  while(del.firstChild) span.appendChild(del.firstChild);
+  parent.replaceChild(span, del);
+  if(t){ t.trContent = editable.innerHTML; persistState(); }
+  setTimeout(()=>{
+    if(!span.parentNode) return;
+    const p = span.parentNode;
+    while(span.firstChild) p.insertBefore(span.firstChild, span);
+    p.removeChild(span);
+    p.normalize();
+    if(t && state.tabs.includes(t)){ t.trContent = editable.innerHTML; persistState(); }
+  }, 500);
+}
+
+// Reset — drop user edits and re-seed from the source transcript.
+function resetTranscriptEdits(t){
+  t.trContent = null;
+  delete t.trStrikes;
+  const sel = window.getSelection();
+  if(sel) sel.removeAllRanges();
+  render();
+}
+function findTrText(node){
+  while(node && node !== document){
+    if(node.nodeType === 1 && node.classList && node.classList.contains('tr-text')) return node;
+    node = node.parentNode;
+  }
+  return null;
+}
+
+// Transcript clipboard/drag rules:
+// - Copy:  word-snap the selection, then let the browser copy it.
+// - Cut:   word-snap, push to clipboard manually, then strike the source (no deletion).
+// - Paste: insert pasted text at the word-boundary split point (strikes any selection first).
+// - Drag:  disabled inside the transcript — users should cut/copy/paste, which follow the rules.
+document.addEventListener('copy', e=>{
+  const editable = e.target?.closest?.('.tr-text[contenteditable]');
+  if(!editable) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed) return;
+  expandSelectionToWords();
+}, true);
+
+document.addEventListener('cut', e=>{
+  const editable = e.target?.closest?.('.tr-text[contenteditable]');
+  if(!editable) return;
+  const t = curTab();
+  if(!t) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed) return;
+  expandSelectionToWords();
+  const text = sel.toString();
+  e.preventDefault();
+  e.clipboardData.setData('text/plain', text);
+  applyTranscriptStrike(t);
+}, true);
+
+document.addEventListener('paste', e=>{
+  const editable = e.target?.closest?.('.tr-text[contenteditable]');
+  if(!editable) return;
+  const t = curTab();
+  if(!t) return;
+  const text = e.clipboardData?.getData('text/plain');
+  if(!text) return;
+  e.preventDefault();
+  insertAtTranscriptSplitPoint(t, document.createTextNode(text));
+}, true);
+
+document.addEventListener('dragstart', e=>{
+  if(e.target?.closest?.('.tr-text[contenteditable]')) e.preventDefault();
+}, true);
+
 document.addEventListener('keydown', e=>{
+  // ⌘⇧X / Ctrl+Shift+X — strikethrough selected transcript text
+  if((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'x' || e.key === 'X')){
+    const t = curTab();
+    if(t && t.activeRightTab === 'transcript'){
+      e.preventDefault();
+      applyTranscriptStrike(t);
+      return;
+    }
+  }
+  // Backspace/Delete inside the transcript editable → strike the adjacent word.
+  if((e.key === 'Backspace' || e.key === 'Delete') && e.target.dataset && e.target.dataset.field === 'transcript'){
+    const t = curTab();
+    if(!t) return;
+    e.preventDefault();
+    applyTranscriptStrike(t, e.key === 'Backspace' ? 'backward' : 'forward');
+    return;
+  }
   if(e.key !== 'Enter') return;
   const field = e.target.dataset && e.target.dataset.field;
+  if(field === 'transcript'){
+    const t = curTab();
+    if(!t) return;
+    e.preventDefault();
+    applyTranscriptSplit(t);
+    return;
+  }
   if(field === 'auth-email'){
     e.preventDefault();
     state.authEmail = e.target.value.trim();
@@ -1603,6 +1990,12 @@ document.addEventListener('keydown', e=>{
 // capture contenteditable prompts
 document.addEventListener('input', e=>{
   const t = curTab(); if(!t) return;
+  if(e.target.dataset.field==='transcript') {
+    // Mirror live edits into state; skip render() so the caret survives.
+    t.trContent = e.target.innerHTML;
+    persistState();
+    return;
+  }
   if(e.target.dataset.field==='prompt') {
     t.promptText = e.target.innerText;
     // Talking-head: live-update chip states from the prompt text without re-rendering the whole frame
@@ -1691,7 +2084,20 @@ document.addEventListener('fullscreenchange', ()=>{
 });
 
 // ── BOOT
-reset();
+// Hot-reload friendly: if session has a saved state, rehydrate instead of starting fresh.
+if(restoreState() && (state.tabs?.length || state.authStep)){
+  // Reflect restored startState in the dev toggle strip
+  if(state.authStep){
+    const b = document.querySelector('#state-grp b[data-state="auth"]');
+    if(b){ $$('#state-grp b').forEach(x=>x.classList.remove('on')); b.classList.add('on'); }
+  } else if(state.startState){
+    const b = document.querySelector(`#state-grp b[data-state="${state.startState}"]`);
+    if(b){ $$('#state-grp b').forEach(x=>x.classList.remove('on')); b.classList.add('on'); }
+  }
+  render();
+} else {
+  reset();
+}
 </script>
 </body>
 </html>
