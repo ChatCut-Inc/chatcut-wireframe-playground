@@ -318,15 +318,15 @@ body.immersive #exit-immersive{display:block;}
 .tr-meta{display:flex;align-items:baseline;gap:10px;}
 .tr-sp{font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:var(--ink);}
 .tr-ts{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#888;letter-spacing:.04em;}
-.tr-text{font-family:'Kalam',cursive;font-size:14px;line-height:1.55;color:#222;}
+.tr-text{font-family:'Special Elite',monospace;font-size:13px;line-height:1.55;color:#222;letter-spacing:-0.01em;}
 .tr-text del{position:relative;color:#a69f94;text-decoration:line-through;text-decoration-color:#c3483a;text-decoration-thickness:1.5px;text-decoration-skip-ink:none;background:rgba(195,72,58,.05);cursor:pointer;transition:color .18s ease,background .18s ease,text-decoration-color .18s ease;}
 .tr-text del:hover{color:#6b6459;background:rgba(195,72,58,.02);}
 .tr-text del::after{content:"↺ restore";position:absolute;left:50%;bottom:100%;transform:translate(-50%,4px);margin-bottom:3px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fdfcf7;background:var(--ink);border:1px solid var(--ink);box-shadow:1.5px 1.5px 0 rgba(0,0,0,.15);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease;z-index:5;}
 .tr-text del:hover::after{opacity:1;transform:translate(-50%,0);}
 @keyframes tr-restore-flash{0%{background:rgba(76,128,98,.22);}100%{background:transparent;}}
 .tr-text .tr-restored{animation:tr-restore-flash .5s ease-out;border-radius:2px;}
-/* User-authored additions: typewriter font. Source of text = font. */
-.tr-text ins.tr-add{font-family:'Special Elite',monospace;font-size:13px;text-decoration:none;color:#1a1a1a;letter-spacing:-0.01em;}
+/* User-authored additions: handwriting font. Source of text = font. */
+.tr-text ins.tr-add{font-family:'Kalam',cursive;font-size:14px;text-decoration:none;color:#1a1a1a;letter-spacing:normal;}
 
 /* transcript toolbar — bleeds from the active tab, holds text-editing tools */
 .tr-toolbar{display:flex;align-items:center;gap:6px;padding:5px 14px;background:var(--paper);border-bottom:1.2px solid var(--ink);flex-shrink:0;min-height:34px;}
@@ -1907,7 +1907,7 @@ function findTrText(node){
 }
 
 // User-authored text lives inside <ins class="tr-add">. Font carries the source:
-// bare text = AI-transcribed speech (handwriting); <ins> = user keystrokes (typewriter).
+// bare text = AI-transcribed speech (typewriter); <ins> = user keystrokes (handwriting).
 function createTranscriptInsertion(text){
   const ins = document.createElement('ins');
   ins.className = 'tr-add';
