@@ -33,3 +33,8 @@ panel appear when there's real output to show.
 
 The other three states jump you directly into a single slice — useful for
 reviewing specific phases in isolation, not for feeling the full flow.
+
+## Changelog
+
+### Apr 20 2026
+- Removed kind-label badges (EDIT / GEN / TMPL) from project tiles in the gallery — cleaner visual, type conveyed by color alone.

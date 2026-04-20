@@ -181,7 +181,6 @@ body.immersive #exit-immersive{display:block;}
 .tile:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);}
 .tile .thumb{aspect-ratio:16/9;border-bottom:1.2px solid var(--ink);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .tile .thumb .dur{position:absolute;bottom:3px;right:3px;background:rgba(0,0,0,.75);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;padding:0 5px;}
-.tile .thumb .kind{position:absolute;top:3px;left:3px;background:#fff;color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:8px;padding:1px 4px;border:1px solid var(--ink);letter-spacing:.04em;}
 .tile .thumb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(0,0,0,.7);}
 .tile .body{padding:6px 9px;}
 .tile .body b{font-family:'Caveat',cursive;font-size:14px;font-weight:700;display:block;line-height:1.1;}
@@ -917,15 +916,15 @@ function renderGallery(){
       body = `
       <div class="gsec">Today</div>
       <div class="grid3">
-        ${tileHtml({kind:'head',kl:'EDIT',name:'Founder interview · 60s',dur:'0:58',meta:'active · 2m ago'})}
-        ${tileHtml({kind:'vo',kl:'GEN',name:'Script · launch VO',dur:'0:24',meta:'12m ago'})}
-        ${tileHtml({kind:'mg',kl:'TMPL',name:'Intro stinger',dur:'0:03',meta:'1h ago · draft'})}
+        ${tileHtml({kind:'head',name:'Founder interview · 60s',dur:'0:58',meta:'active · 2m ago'})}
+        ${tileHtml({kind:'vo',name:'Script · launch VO',dur:'0:24',meta:'12m ago'})}
+        ${tileHtml({kind:'mg',name:'Intro stinger',dur:'0:03',meta:'1h ago · draft'})}
       </div>
       <div class="gsec">Yesterday</div>
       <div class="grid3">
-        ${tileHtml({kind:'pod',kl:'EDIT',name:'Podcast ep 14',dur:'1:12',meta:'exported'})}
-        ${tileHtml({kind:'ugc',kl:'EDIT',name:'UGC — Rally',dur:'0:15',meta:'shared'})}
-        ${tileHtml({kind:'ai',kl:'GEN',name:'Sizzle open',dur:'0:08',meta:'draft'})}
+        ${tileHtml({kind:'pod',name:'Podcast ep 14',dur:'1:12',meta:'exported'})}
+        ${tileHtml({kind:'ugc',name:'UGC — Rally',dur:'0:15',meta:'shared'})}
+        ${tileHtml({kind:'ai',name:'Sizzle open',dur:'0:08',meta:'draft'})}
       </div>
     `;
     }
@@ -936,14 +935,14 @@ function renderGallery(){
       body = `
       <div class="chips" style="margin-bottom:4px;"><span class="c on">All · 8</span><span class="c">Drafts · 3</span><span class="c">Exported · 4</span><span class="c">Shared · 1</span></div>
       <div class="grid4">
-        ${tileHtml({kind:'head',kl:'EDIT',name:'Founder interview',dur:'0:58',meta:'today'})}
-        ${tileHtml({kind:'pod',kl:'EDIT',name:'Podcast ep 14',dur:'1:12',meta:'today'})}
-        ${tileHtml({kind:'ugc',kl:'EDIT',name:'UGC — Rally',dur:'0:15',meta:'yesterday'})}
-        ${tileHtml({kind:'mg',kl:'TMPL',name:'Lower-third',dur:'—',meta:'yesterday'})}
-        ${tileHtml({kind:'ai',kl:'GEN',name:'Sizzle open',dur:'0:08',meta:'mon'})}
-        ${tileHtml({kind:'int',kl:'EDIT',name:'Interview · Martha',dur:'2:04',meta:'mon'})}
-        ${tileHtml({kind:'vo',kl:'GEN',name:'VO · launch',dur:'0:24',meta:'sun'})}
-        ${tileHtml({kind:'mus',kl:'GEN',name:'Music theme',dur:'0:20',meta:'sun'})}
+        ${tileHtml({kind:'head',name:'Founder interview',dur:'0:58',meta:'today'})}
+        ${tileHtml({kind:'pod',name:'Podcast ep 14',dur:'1:12',meta:'today'})}
+        ${tileHtml({kind:'ugc',name:'UGC — Rally',dur:'0:15',meta:'yesterday'})}
+        ${tileHtml({kind:'mg',name:'Lower-third',dur:'—',meta:'yesterday'})}
+        ${tileHtml({kind:'ai',name:'Sizzle open',dur:'0:08',meta:'mon'})}
+        ${tileHtml({kind:'int',name:'Interview · Martha',dur:'2:04',meta:'mon'})}
+        ${tileHtml({kind:'vo',name:'VO · launch',dur:'0:24',meta:'sun'})}
+        ${tileHtml({kind:'mus',name:'Music theme',dur:'0:20',meta:'sun'})}
       </div>
     `;
     }
@@ -972,7 +971,7 @@ function renderGallery(){
 }
 
 function tileHtml(e){
-  return `<div class="tile" data-example="${e.name}"><div class="thumb th-${e.kind}"><span class="kind">${e.kl}</span><span class="play">▶</span><span class="dur">${e.dur}</span></div><div class="body"><b>${e.name}</b><span class="m">${e.meta}</span></div></div>`;
+  return `<div class="tile" data-example="${e.name}"><div class="thumb th-${e.kind}"><span class="play">▶</span><span class="dur">${e.dur}</span></div><div class="body"><b>${e.name}</b><span class="m">${e.meta}</span></div></div>`;
 }
 
 function emptyGalleryHtml(title, sub, cta){
