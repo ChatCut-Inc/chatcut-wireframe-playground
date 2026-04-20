@@ -5,7 +5,7 @@
 <title>ChatCut — Interactive Onboarding Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Kalam:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#1a1a1a;--paper:#fafaf7;--warm:#f4f1ea;--faint:#cfcabd;
@@ -325,6 +325,11 @@ body.immersive #exit-immersive{display:block;}
 .tr-text del:hover::after{opacity:1;transform:translate(-50%,0);}
 @keyframes tr-restore-flash{0%{background:rgba(76,128,98,.22);}100%{background:transparent;}}
 .tr-text .tr-restored{animation:tr-restore-flash .5s ease-out;border-radius:2px;}
+/* User-authored additions: typewriter font. Source of text = font. */
+.tr-text ins.tr-add{position:relative;font-family:'Special Elite',monospace;font-size:13px;text-decoration:none;color:#1a1a1a;letter-spacing:-0.01em;cursor:pointer;transition:opacity .18s ease;}
+.tr-text ins.tr-add:hover{opacity:.72;}
+.tr-text ins.tr-add::after{content:"✕ remove";position:absolute;left:50%;bottom:100%;transform:translate(-50%,4px);margin-bottom:3px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fdfcf7;background:var(--ink);border:1px solid var(--ink);box-shadow:1.5px 1.5px 0 rgba(0,0,0,.15);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease;z-index:5;}
+.tr-text ins.tr-add:hover::after{opacity:1;transform:translate(-50%,0);}
 
 /* transcript toolbar — bleeds from the active tab, holds text-editing tools */
 .tr-toolbar{display:flex;align-items:center;gap:6px;padding:5px 14px;background:var(--paper);border-bottom:1.2px solid var(--ink);flex-shrink:0;min-height:34px;}
@@ -1657,6 +1662,22 @@ document.addEventListener('click',e=>{
     }
   }
 
+  // transcript: click a user-added run to remove it (symmetric to restore)
+  const addedEl = e.target.closest('.tr-text ins.tr-add');
+  if(addedEl){
+    const editable = findTrText(addedEl);
+    if(editable){
+      const sel = window.getSelection();
+      const draggedSelection = sel && !sel.isCollapsed && sel.toString().length > 0 && editable.contains(sel.anchorNode);
+      if(!draggedSelection){
+        addedEl.remove();
+        t.trContent = editable.innerHTML;
+        persistState();
+        return;
+      }
+    }
+  }
+
   // left-panel tab switch (AI / Transcript)
   const lt = e.target.closest('[data-left-tab]');
   if(lt){ t.activeLeftTab = lt.dataset.leftTab; render(); return; }
@@ -1904,6 +1925,63 @@ function findTrText(node){
   return null;
 }
 
+// User-authored text lives inside <ins class="tr-add">. Font carries the source:
+// bare text = AI-transcribed speech (handwriting); <ins> = user keystrokes (typewriter).
+function createTranscriptInsertion(text){
+  const ins = document.createElement('ins');
+  ins.className = 'tr-add';
+  ins.textContent = text;
+  return ins;
+}
+
+// Typing inside the transcript: wrap new chars in <ins>. If the caret is already
+// inside a tr-add <ins>, extend it so contiguous typing stays in one element.
+function handleTranscriptTyping(t, editable, text){
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+
+  // Typing over a selection: strike + insert at word boundary (reuses the split helper).
+  if(!range.collapsed){
+    insertAtTranscriptSplitPoint(t, createTranscriptInsertion(text));
+    return;
+  }
+
+  const container = range.startContainer;
+  const parent = container.nodeType === 3 ? container.parentNode : container;
+  // Continue an existing <ins.tr-add> if the caret is inside one.
+  if(parent?.tagName === 'INS' && parent.classList.contains('tr-add') && container.nodeType === 3){
+    const before = container.data.slice(0, range.startOffset);
+    const after = container.data.slice(range.startOffset);
+    container.data = before + text + after;
+    range.setStart(container, before.length + text.length);
+    range.collapse(true);
+  } else {
+    const ins = createTranscriptInsertion(text);
+    range.insertNode(ins);
+    range.setStart(ins.firstChild, text.length);
+    range.collapse(true);
+  }
+  sel.removeAllRanges();
+  sel.addRange(range);
+  t.trContent = editable.innerHTML;
+  persistState();
+}
+
+document.addEventListener('beforeinput', e=>{
+  const editable = e.target?.closest?.('.tr-text[contenteditable]');
+  if(!editable) return;
+  const t = curTab();
+  if(!t) return;
+  // Route text insertions through our <ins> wrapper. Other inputTypes (deleteContent*,
+  // insertParagraph, insertFromPaste, insertFromDrop) are handled by their own events.
+  if(e.inputType === 'insertText' || e.inputType === 'insertReplacementText'){
+    if(e.data == null) return;
+    e.preventDefault();
+    handleTranscriptTyping(t, editable, e.data);
+  }
+}, true);
+
 // Transcript clipboard/drag rules:
 // - Copy:  word-snap the selection, then let the browser copy it.
 // - Cut:   word-snap, push to clipboard manually, then strike the source (no deletion).
@@ -1939,7 +2017,7 @@ document.addEventListener('paste', e=>{
   const text = e.clipboardData?.getData('text/plain');
   if(!text) return;
   e.preventDefault();
-  insertAtTranscriptSplitPoint(t, document.createTextNode(text));
+  insertAtTranscriptSplitPoint(t, createTranscriptInsertion(text));
 }, true);
 
 document.addEventListener('dragstart', e=>{
