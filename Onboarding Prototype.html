@@ -326,10 +326,7 @@ body.immersive #exit-immersive{display:block;}
 @keyframes tr-restore-flash{0%{background:rgba(76,128,98,.22);}100%{background:transparent;}}
 .tr-text .tr-restored{animation:tr-restore-flash .5s ease-out;border-radius:2px;}
 /* User-authored additions: typewriter font. Source of text = font. */
-.tr-text ins.tr-add{position:relative;font-family:'Special Elite',monospace;font-size:13px;text-decoration:none;color:#1a1a1a;letter-spacing:-0.01em;cursor:pointer;transition:opacity .18s ease;}
-.tr-text ins.tr-add:hover{opacity:.72;}
-.tr-text ins.tr-add::after{content:"✕ remove";position:absolute;left:50%;bottom:100%;transform:translate(-50%,4px);margin-bottom:3px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fdfcf7;background:var(--ink);border:1px solid var(--ink);box-shadow:1.5px 1.5px 0 rgba(0,0,0,.15);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease;z-index:5;}
-.tr-text ins.tr-add:hover::after{opacity:1;transform:translate(-50%,0);}
+.tr-text ins.tr-add{font-family:'Special Elite',monospace;font-size:13px;text-decoration:none;color:#1a1a1a;letter-spacing:-0.01em;}
 
 /* transcript toolbar — bleeds from the active tab, holds text-editing tools */
 .tr-toolbar{display:flex;align-items:center;gap:6px;padding:5px 14px;background:var(--paper);border-bottom:1.2px solid var(--ink);flex-shrink:0;min-height:34px;}
@@ -1657,22 +1654,6 @@ document.addEventListener('click',e=>{
       const draggedSelection = sel && !sel.isCollapsed && sel.toString().length > 0 && editable.contains(sel.anchorNode);
       if(!draggedSelection){
         restoreTranscriptWord(struckEl, editable, t);
-        return;
-      }
-    }
-  }
-
-  // transcript: click a user-added run to remove it (symmetric to restore)
-  const addedEl = e.target.closest('.tr-text ins.tr-add');
-  if(addedEl){
-    const editable = findTrText(addedEl);
-    if(editable){
-      const sel = window.getSelection();
-      const draggedSelection = sel && !sel.isCollapsed && sel.toString().length > 0 && editable.contains(sel.anchorNode);
-      if(!draggedSelection){
-        addedEl.remove();
-        t.trContent = editable.innerHTML;
-        persistState();
         return;
       }
     }
