@@ -1934,14 +1934,11 @@ function createTranscriptInsertion(text){
   return ins;
 }
 
-// Typing inside the transcript: wrap new chars in <ins>. If the caret is already
-// inside a tr-add <ins>, extend it so contiguous typing stays in one element.
 function handleTranscriptTyping(t, editable, text){
   const sel = window.getSelection();
   if(!sel || sel.rangeCount === 0) return;
   const range = sel.getRangeAt(0);
 
-  // Typing over a selection: strike + insert at word boundary (reuses the split helper).
   if(!range.collapsed){
     insertAtTranscriptSplitPoint(t, createTranscriptInsertion(text));
     return;
@@ -1949,7 +1946,6 @@ function handleTranscriptTyping(t, editable, text){
 
   const container = range.startContainer;
   const parent = container.nodeType === 3 ? container.parentNode : container;
-  // Continue an existing <ins.tr-add> if the caret is inside one.
   if(parent?.tagName === 'INS' && parent.classList.contains('tr-add') && container.nodeType === 3){
     const before = container.data.slice(0, range.startOffset);
     const after = container.data.slice(range.startOffset);
@@ -1968,38 +1964,39 @@ function handleTranscriptTyping(t, editable, text){
   persistState();
 }
 
-document.addEventListener('beforeinput', e=>{
-  const editable = e.target?.closest?.('.tr-text[contenteditable]');
-  if(!editable) return;
-  const t = curTab();
-  if(!t) return;
-  // Route text insertions through our <ins> wrapper. Other inputTypes (deleteContent*,
-  // insertParagraph, insertFromPaste, insertFromDrop) are handled by their own events.
-  if(e.inputType === 'insertText' || e.inputType === 'insertReplacementText'){
-    if(e.data == null) return;
-    e.preventDefault();
-    handleTranscriptTyping(t, editable, e.data);
-  }
-}, true);
+// Fires handler only when the event originated inside the transcript editable
+// and a current tab exists. Centralises the preamble every transcript listener needs.
+function onTranscriptEvent(evt, fn){
+  document.addEventListener(evt, e=>{
+    const editable = e.target?.closest?.('.tr-text[contenteditable]');
+    if(!editable) return;
+    const t = curTab();
+    if(!t) return;
+    fn(e, t, editable);
+  }, true);
+}
 
-// Transcript clipboard/drag rules:
-// - Copy:  word-snap the selection, then let the browser copy it.
-// - Cut:   word-snap, push to clipboard manually, then strike the source (no deletion).
-// - Paste: insert pasted text at the word-boundary split point (strikes any selection first).
-// - Drag:  disabled inside the transcript — users should cut/copy/paste, which follow the rules.
-document.addEventListener('copy', e=>{
-  const editable = e.target?.closest?.('.tr-text[contenteditable]');
-  if(!editable) return;
+// Transcript clipboard / typing / drag rules:
+// - beforeinput: route text insertions through our <ins> wrapper. Other inputTypes
+//   (deleteContent*, insertParagraph, insertFromPaste, insertFromDrop) have their own events.
+// - copy:  word-snap the selection, then let the browser copy it.
+// - cut:   word-snap, push to clipboard manually, then strike the source (no deletion).
+// - paste: insert pasted text at the word-boundary split point (strikes any selection first).
+// - drag:  disabled — users should cut/copy/paste, which follow the rules.
+onTranscriptEvent('beforeinput', (e, t, editable)=>{
+  if(e.inputType !== 'insertText' && e.inputType !== 'insertReplacementText') return;
+  if(e.data == null) return;
+  e.preventDefault();
+  handleTranscriptTyping(t, editable, e.data);
+});
+
+onTranscriptEvent('copy', ()=>{
   const sel = window.getSelection();
   if(!sel || sel.isCollapsed) return;
   expandSelectionToWords();
-}, true);
+});
 
-document.addEventListener('cut', e=>{
-  const editable = e.target?.closest?.('.tr-text[contenteditable]');
-  if(!editable) return;
-  const t = curTab();
-  if(!t) return;
+onTranscriptEvent('cut', (e, t)=>{
   const sel = window.getSelection();
   if(!sel || sel.isCollapsed) return;
   expandSelectionToWords();
@@ -2007,22 +2004,16 @@ document.addEventListener('cut', e=>{
   e.preventDefault();
   e.clipboardData.setData('text/plain', text);
   applyTranscriptStrike(t);
-}, true);
+});
 
-document.addEventListener('paste', e=>{
-  const editable = e.target?.closest?.('.tr-text[contenteditable]');
-  if(!editable) return;
-  const t = curTab();
-  if(!t) return;
+onTranscriptEvent('paste', (e, t)=>{
   const text = e.clipboardData?.getData('text/plain');
   if(!text) return;
   e.preventDefault();
   insertAtTranscriptSplitPoint(t, createTranscriptInsertion(text));
-}, true);
+});
 
-document.addEventListener('dragstart', e=>{
-  if(e.target?.closest?.('.tr-text[contenteditable]')) e.preventDefault();
-}, true);
+onTranscriptEvent('dragstart', e=> e.preventDefault());
 
 document.addEventListener('keydown', e=>{
   // ⌘⇧X / Ctrl+Shift+X — strikethrough selected transcript text
