@@ -915,16 +915,16 @@ function renderGallery(){
     } else {
       body = `
       <div class="gsec">Today</div>
-      <div class="grid3">
-        ${tileHtml({kind:'head',name:'Founder interview · 60s',dur:'0:58',meta:'active · 2m ago'})}
+      <div class="grid4">
+        ${tileHtml({kind:'head',name:'Founder interview · 60s',dur:'0:58',meta:'2m ago'})}
         ${tileHtml({kind:'vo',name:'Script · launch VO',dur:'0:24',meta:'12m ago'})}
-        ${tileHtml({kind:'mg',name:'Intro stinger',dur:'0:03',meta:'1h ago · draft'})}
+        ${tileHtml({kind:'mg',name:'Intro stinger',dur:'0:03',meta:'1h ago'})}
       </div>
       <div class="gsec">Yesterday</div>
-      <div class="grid3">
-        ${tileHtml({kind:'pod',name:'Podcast ep 14',dur:'1:12',meta:'exported'})}
-        ${tileHtml({kind:'ugc',name:'UGC — Rally',dur:'0:15',meta:'shared'})}
-        ${tileHtml({kind:'ai',name:'Sizzle open',dur:'0:08',meta:'draft'})}
+      <div class="grid4">
+        ${tileHtml({kind:'pod',name:'Podcast ep 14',dur:'1:12',meta:'yesterday'})}
+        ${tileHtml({kind:'ugc',name:'UGC — Rally',dur:'0:15',meta:'yesterday'})}
+        ${tileHtml({kind:'ai',name:'Sizzle open',dur:'0:08',meta:'yesterday'})}
       </div>
     `;
     }
@@ -933,7 +933,6 @@ function renderGallery(){
       body = emptyGalleryHtml('No projects yet','Your first creation lands here. Pick a scenario on the left to start.');
     } else {
       body = `
-      <div class="chips" style="margin-bottom:4px;"><span class="c on">All · 8</span><span class="c">Drafts · 3</span><span class="c">Exported · 4</span><span class="c">Shared · 1</span></div>
       <div class="grid4">
         ${tileHtml({kind:'head',name:'Founder interview',dur:'0:58',meta:'today'})}
         ${tileHtml({kind:'pod',name:'Podcast ep 14',dur:'1:12',meta:'today'})}
